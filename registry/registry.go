@@ -17,8 +17,8 @@ import (
 // Registry is a collection of Template
 type Registry struct {
 	dir       string
-	Sources   []*Source
-	Templates []*Template
+	Sources   []*Source   `toml:"sources"`
+	Templates []*Template `toml:"templates"`
 }
 
 func (r *Registry) save() error {
