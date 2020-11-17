@@ -1,0 +1,6 @@
+# GoLand
+.idea/
+
+# Binaries
+/tmpl
+/tmpl.exe
