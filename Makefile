@@ -16,3 +16,7 @@ fmt:
 .PHONY: test
 test:
 	$(GO) test -race ./...
+
+.PHONY: docs
+docs:
+	$(GO) run docs.go
