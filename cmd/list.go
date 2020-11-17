@@ -25,13 +25,10 @@ func runList(_ *cli.Context) error {
 	}
 
 	wr := tabwriter.NewWriter(os.Stdout, 0, 8, 0, '\t', 0)
-
-	fmt.Println("Templates")
 	for _, t := range reg.Templates {
-		if _, err := fmt.Fprintf(wr, "%s\t%s@%s\t%s", t.Name, t.Repository, t.Branch, t.Created); err != nil {
+		if _, err := fmt.Fprintf(wr, "%s\t%s@%s\t%s\n", t.Name, t.Repository, t.Branch, t.Created); err != nil {
 			return err
 		}
 	}
-	fmt.Println()
-	return nil
+	return wr.Flush()
 }
