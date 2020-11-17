@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -105,9 +106,16 @@ func prompt(dir string) (map[string]interface{}, error) {
 		return nil, err
 	}
 
+	// Sort the map keys so they are consistent
 	vars := tree.ToMap()
+	sorted := make([]string, 0, len(vars))
+	for k := range vars {
+		sorted = append(sorted, k)
+	}
+	sort.Strings(sorted)
 
-	for k, v := range vars {
+	for _, k := range sorted {
+		v := vars[k]
 		var p survey.Prompt
 		switch t := v.(type) {
 		case []string:
