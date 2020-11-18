@@ -14,7 +14,7 @@ var (
 	destDir string
 	reg     *Registry
 
-	tmplContents = `{{title name}} {{year}}`
+	tmplContents = `{{title name}} {{.year}}`
 	tmplTemplate = `name = "john olheiser"
 year = 2020`
 	tmplGold = "John Olheiser 2020"

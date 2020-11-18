@@ -135,20 +135,11 @@ func prompt(dir string, defaults bool) (map[string]interface{}, error) {
 				Default: fmt.Sprintf("%v", t),
 			}
 		}
-		q := []*survey.Question{
-			{
-				Name:     "response",
-				Prompt:   p,
-				Validate: survey.Required,
-			},
-		}
-		a := struct {
-			Response string
-		}{}
-		if err := survey.Ask(q, &a); err != nil {
+		var a string
+		if err := survey.AskOne(p, &a); err != nil {
 			return nil, err
 		}
-		vars[k] = a.Response
+		vars[k] = a
 	}
 
 	return vars, nil
