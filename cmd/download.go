@@ -59,7 +59,7 @@ func runDownload(ctx *cli.Context) error {
 		cloneURL = source.CloneURL(cloneURL)
 	}
 
-	t, err := reg.AddTemplate(ctx.Args().Get(1), cloneURL, ctx.String("branch"))
+	t, err := reg.DownloadTemplate(ctx.Args().Get(1), cloneURL, ctx.String("branch"))
 	if err != nil {
 		return err
 	}

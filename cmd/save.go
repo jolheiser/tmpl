@@ -3,7 +3,6 @@ package cmd
 import (
 	"errors"
 	"path/filepath"
-	"strings"
 
 	"go.jolheiser.com/tmpl/cmd/flags"
 	"go.jolheiser.com/tmpl/registry"
@@ -16,16 +15,7 @@ var Save = &cli.Command{
 	Name:        "save",
 	Usage:       "Save a local template",
 	Description: "Save a local template to the registry",
-	Flags: []cli.Flag{
-		&cli.StringFlag{
-			Name:    "branch",
-			Aliases: []string{"b"},
-			Usage:   "Branch to clone",
-			Value:   "main",
-			EnvVars: []string{"TMPL_BRANCH"},
-		},
-	},
-	Action: runSave,
+	Action:      runSave,
 }
 
 func runSave(ctx *cli.Context) error {
@@ -38,17 +28,13 @@ func runSave(ctx *cli.Context) error {
 		return err
 	}
 
-	// Did the user give us the root path, or the .git directory?
 	localPath := ctx.Args().First()
-	if !strings.HasSuffix(localPath, ".git") {
-		localPath = filepath.Join(localPath, ".git")
-	}
 	localPath, err = filepath.Abs(localPath)
 	if err != nil {
 		return err
 	}
 
-	t, err := reg.AddTemplate(ctx.Args().Get(1), localPath, ctx.String("branch"))
+	t, err := reg.SaveTemplate(ctx.Args().Get(1), localPath)
 	if err != nil {
 		return err
 	}

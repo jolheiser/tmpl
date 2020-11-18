@@ -2,12 +2,12 @@ package registry
 
 import (
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -19,6 +19,7 @@ import (
 type Template struct {
 	reg        *Registry `toml:"-"`
 	Name       string    `toml:"name"`
+	Path       string    `toml:"path"`
 	Repository string    `toml:"repository"`
 	Branch     string    `toml:"branch"`
 	Created    time.Time `toml:"created"`
@@ -35,7 +36,7 @@ func (t *Template) ArchivePath() string {
 }
 
 // Execute runs the Template and copies to dest
-func (t *Template) Execute(dest string) error {
+func (t *Template) Execute(dest string, defaults bool) error {
 	tmp, err := ioutil.TempDir(os.TempDir(), "tmpl")
 	if err != nil {
 		return err
@@ -46,7 +47,7 @@ func (t *Template) Execute(dest string) error {
 		return err
 	}
 
-	vars, err := prompt(tmp)
+	vars, err := prompt(tmp, defaults)
 	if err != nil {
 		return err
 	}
@@ -66,7 +67,7 @@ func (t *Template) Execute(dest string) error {
 			return err
 		}
 
-		tmpl, err := template.New("tmpl").Parse(string(contents))
+		tmpl, err := template.New("tmpl").Funcs(mergeMaps(funcMap, convertMap(vars))).Parse(string(contents))
 		if err != nil {
 			return err
 		}
@@ -95,7 +96,7 @@ func (t *Template) Execute(dest string) error {
 	})
 }
 
-func prompt(dir string) (map[string]interface{}, error) {
+func prompt(dir string, defaults bool) (map[string]interface{}, error) {
 	templatePath := filepath.Join(dir, "template.toml")
 	if _, err := os.Lstat(templatePath); err != nil {
 		return nil, err
@@ -105,9 +106,14 @@ func prompt(dir string) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+	vars := tree.ToMap()
+
+	// Return early if we only want defaults
+	if defaults {
+		return vars, nil
+	}
 
 	// Sort the map keys so they are consistent
-	vars := tree.ToMap()
 	sorted := make([]string, 0, len(vars))
 	for k := range vars {
 		sorted = append(sorted, k)
@@ -146,4 +152,25 @@ func prompt(dir string) (map[string]interface{}, error) {
 	}
 
 	return vars, nil
+}
+
+func convertMap(m map[string]interface{}) template.FuncMap {
+	mm := make(template.FuncMap)
+	for k, v := range m {
+		vv := v // Enclosures in a loop
+		mm[k] = func() interface{} {
+			return fmt.Sprintf("%v", vv)
+		}
+	}
+	return mm
+}
+
+func mergeMaps(maps ...map[string]interface{}) map[string]interface{} {
+	m := make(map[string]interface{})
+	for _, mm := range maps {
+		for k, v := range mm {
+			m[k] = v
+		}
+	}
+	return m
 }

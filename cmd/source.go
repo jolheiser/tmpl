@@ -35,15 +35,15 @@ var (
 
 	SourceAdd = &cli.Command{
 		Name:        "add",
-		Usage:       "AddTemplate a source",
-		Description: "AddTemplate a new source to the registry",
+		Usage:       "Add a source",
+		Description: "Add a new source to the registry",
 		Action:      runSourceAdd,
 	}
 
 	SourceRemove = &cli.Command{
 		Name:        "remove",
-		Usage:       "RemoveTemplate a source",
-		Description: "RemoveTemplate a source from the registry",
+		Usage:       "Remove a source",
+		Description: "Remove a source from the registry",
 		Action:      runSourceRemove,
 	}
 )

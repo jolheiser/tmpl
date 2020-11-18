@@ -51,8 +51,6 @@ Remove a template
 
 Save a local template
 
-**--branch, -b**="": Branch to clone (default: main)
-
 ## source
 
 Commands for working with sources
@@ -63,11 +61,11 @@ List available sources
 
 ### add
 
-AddTemplate a source
+Add a source
 
 ### remove
 
-RemoveTemplate a source
+Remove a source
 
 ## test
 
@@ -80,3 +78,5 @@ Update a template
 ## use
 
 Use a template
+
+**--defaults**: Use template defaults

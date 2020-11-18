@@ -8,6 +8,10 @@ The two projects share many similarities, however other than general layout/stru
 
 [CLI Docs](DOCS.md)
 
+## Examples 
+
+Checkout the [license](https://gitea.com/jolheiser/tmpls/src/branch/license) and [makefile](https://gitea.com/jolheiser/tmpls/src/branch/makefile) branch of my [template repository](https://gitea.com/jolheiser/tmpls). 
+
 ## License
 
 [MIT](LICENSE)

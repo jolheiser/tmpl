@@ -36,7 +36,12 @@ func runUpdate(ctx *cli.Context) error {
 		return err
 	}
 
-	if _, err := reg.AddTemplate(tmpl.Name, tmpl.Repository, tmpl.Branch); err != nil {
+	if tmpl.Path != "" {
+		_, err = reg.SaveTemplate(tmpl.Name, tmpl.Path)
+	} else {
+		_, err = reg.DownloadTemplate(tmpl.Name, tmpl.Repository, tmpl.Branch)
+	}
+	if err != nil {
 		return err
 	}
 

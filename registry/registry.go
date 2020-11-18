@@ -48,8 +48,8 @@ func (r *Registry) GetTemplate(name string) (*Template, error) {
 	return nil, ErrTemplateNotFound{Name: name}
 }
 
-// AddTemplate downloads and adds a new Template to the Registry
-func (r *Registry) AddTemplate(name, repo, branch string) (*Template, error) {
+// DownloadTemplate downloads and adds a new Template to the Registry
+func (r *Registry) DownloadTemplate(name, repo, branch string) (*Template, error) {
 	t := &Template{
 		reg:        r,
 		Name:       name,
@@ -60,6 +60,23 @@ func (r *Registry) AddTemplate(name, repo, branch string) (*Template, error) {
 	r.Templates = append(r.Templates, t)
 
 	if err := download(repo, branch, t.ArchivePath()); err != nil {
+		return nil, err
+	}
+
+	return t, r.save()
+}
+
+// SaveTemplate saves a local Template to the Registry
+func (r *Registry) SaveTemplate(name, path string) (*Template, error) {
+	t := &Template{
+		reg:     r,
+		Name:    name,
+		Path:    path,
+		Created: time.Now(),
+	}
+	r.Templates = append(r.Templates, t)
+
+	if err := save(path, t.ArchivePath()); err != nil {
 		return nil, err
 	}
 
@@ -178,11 +195,21 @@ func download(cloneURL, branch, dest string) error {
 		return err
 	}
 
-	// Make sure it's a valid template
-	if _, err := os.Lstat(filepath.Join(tmp, "template.toml")); err != nil {
+	// Save the template
+	if err := save(tmp, dest); err != nil {
 		return err
 	}
-	fi, err := os.Lstat(filepath.Join(tmp, "template"))
+
+	return nil
+}
+
+func save(source, dest string) error {
+
+	// Make sure it's a valid template
+	if _, err := os.Lstat(filepath.Join(source, "template.toml")); err != nil {
+		return err
+	}
+	fi, err := os.Lstat(filepath.Join(source, "template"))
 	if err != nil {
 		return err
 	}
@@ -191,7 +218,7 @@ func download(cloneURL, branch, dest string) error {
 	}
 
 	// Create archive
-	glob, err := filepath.Glob(filepath.Join(tmp, "*"))
+	glob, err := filepath.Glob(filepath.Join(source, "*"))
 	if err != nil {
 		return err
 	}

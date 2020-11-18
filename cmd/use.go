@@ -14,7 +14,13 @@ var Use = &cli.Command{
 	Name:        "use",
 	Usage:       "Use a template",
 	Description: "Use (execute) a template from the registry",
-	Action:      runUse,
+	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:  "defaults",
+			Usage: "Use template defaults",
+		},
+	},
+	Action: runUse,
 }
 
 func runUse(ctx *cli.Context) error {
@@ -32,7 +38,7 @@ func runUse(ctx *cli.Context) error {
 		return err
 	}
 
-	if err := tmpl.Execute(ctx.Args().Get(1)); err != nil {
+	if err := tmpl.Execute(ctx.Args().Get(1), ctx.Bool("defaults")); err != nil {
 		return err
 	}
 
