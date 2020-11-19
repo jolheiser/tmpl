@@ -54,7 +54,10 @@ func runSourceList(_ *cli.Context) error {
 		return err
 	}
 
-	wr := tabwriter.NewWriter(os.Stdout, 0, 8, 0, '\t', 0)
+	wr := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
+	if _, err := fmt.Fprintf(wr, "NAME\tURL\n"); err != nil {
+		return err
+	}
 	for _, s := range reg.Sources {
 		if _, err := fmt.Fprintf(wr, "%s\t%s\n", s.Name, s.URL); err != nil {
 			return err

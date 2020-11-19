@@ -24,9 +24,18 @@ func runList(_ *cli.Context) error {
 		return err
 	}
 
-	wr := tabwriter.NewWriter(os.Stdout, 0, 8, 0, '\t', 0)
+	wr := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
+	if _, err := fmt.Fprintf(wr, "NAME\tURL\tLOCAL\tUPDATED\n"); err != nil {
+		return err
+	}
 	for _, t := range reg.Templates {
-		if _, err := fmt.Fprintf(wr, "%s\t%s@%s\t%s\n", t.Name, t.Repository, t.Branch, t.Created); err != nil {
+		u := fmt.Sprintf("%s @%s", t.Repository, t.Branch)
+		var local bool
+		if t.Path != "" {
+			u = t.Path
+			local = true
+		}
+		if _, err := fmt.Fprintf(wr, "%s\t%s\t%t\t%s\n", t.Name, u, local, t.Created.Format("01/02/2006")); err != nil {
 			return err
 		}
 	}
