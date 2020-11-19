@@ -52,11 +52,11 @@ func runDownload(ctx *cli.Context) error {
 	}
 
 	cloneURL := ctx.Args().First()
-	if !strings.HasSuffix(cloneURL, ".git") {
-		cloneURL += ".git"
-	}
 	if source != nil {
 		cloneURL = source.CloneURL(cloneURL)
+	}
+	if !strings.HasSuffix(cloneURL, ".git") {
+		cloneURL += ".git"
 	}
 
 	t, err := reg.DownloadTemplate(ctx.Args().Get(1), cloneURL, ctx.String("branch"))

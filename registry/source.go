@@ -11,5 +11,5 @@ type Source struct {
 
 // CloneURL constructs a URL suitable for cloning a repository
 func (s *Source) CloneURL(namespace string) string {
-	return fmt.Sprintf("%s%s", s.URL, namespace)
+	return fmt.Sprintf("%s%s.git", s.URL, namespace)
 }

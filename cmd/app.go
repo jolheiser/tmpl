@@ -31,27 +31,23 @@ func NewApp() *cli.App {
 	app.Description = "Template automation"
 	app.Version = Version
 	app.Flags = []cli.Flag{
-		&cli.BoolFlag{
-			Name:        "debug",
-			Aliases:     []string{"d"},
-			Usage:       "Debug mode",
-			Destination: &flags.Debug,
-		},
 		&cli.StringFlag{
 			Name:        "registry",
 			Aliases:     []string{"r"},
 			Usage:       "Registry directory of tmpl",
 			Value:       defaultDir,
+			DefaultText: "~/.tmpl",
 			Destination: &flags.Registry,
+			EnvVars:     []string{"TMPL_REGISTRY"},
 		},
 		&cli.StringFlag{
 			Name:        "source",
 			Aliases:     []string{"s"},
 			Usage:       "Short-name source to use",
 			Destination: &flags.Source,
+			EnvVars:     []string{"TMPL_SOURCE"},
 		},
 	}
-	app.Before = before
 
 	app.Commands = []*cli.Command{
 		Download,
@@ -66,11 +62,4 @@ func NewApp() *cli.App {
 	}
 
 	return app
-}
-
-func before(ctx *cli.Context) error {
-	if ctx.Bool("debug") {
-		beaver.Console.Level = beaver.DEBUG
-	}
-	return nil
 }
