@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -16,6 +15,7 @@ var Download = &cli.Command{
 	Name:        "download",
 	Usage:       "Download a template",
 	Description: "Download a template and save it to the local registry",
+	ArgsUsage:   "[repository URL] [name]",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:    "branch",
@@ -30,7 +30,7 @@ var Download = &cli.Command{
 
 func runDownload(ctx *cli.Context) error {
 	if ctx.NArg() < 2 {
-		return errors.New("<repo> <name>")
+		return cli.ShowCommandHelp(ctx, ctx.Command.Name)
 	}
 
 	reg, err := registry.Open(flags.Registry)

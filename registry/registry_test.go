@@ -13,11 +13,6 @@ var (
 	regDir  string
 	destDir string
 	reg     *Registry
-
-	tmplContents = `{{title name}} {{.year}}`
-	tmplTemplate = `name = "john olheiser"
-year = 2020`
-	tmplGold = "John Olheiser 2020"
 )
 
 func TestMain(m *testing.M) {
@@ -78,30 +73,6 @@ func testGetFail(t *testing.T) {
 	}
 }
 
-func testExecute(t *testing.T) {
-	tmpl, err := reg.GetTemplate("test")
-	if err != nil {
-		t.Logf("could not get template")
-		t.FailNow()
-	}
-
-	if err := tmpl.Execute(destDir, true); err != nil {
-		t.Logf("could not execute template: %v\n", err)
-		t.FailNow()
-	}
-
-	contents, err := ioutil.ReadFile(filepath.Join(destDir, "TEST"))
-	if err != nil {
-		t.Logf("could not read file: %v\n", err)
-		t.FailNow()
-	}
-
-	if string(contents) != tmplGold {
-		t.Logf("contents did not match:\n\tExpected: %s\n\tGot: %s", tmplGold, string(contents))
-		t.FailNow()
-	}
-}
-
 func setupTemplate() {
 	var err error
 	tmplDir, err = ioutil.TempDir(os.TempDir(), "tmpl")
@@ -122,10 +93,20 @@ func setupTemplate() {
 		panic(err)
 	}
 
-	// Template file
-	if err := os.Mkdir(filepath.Join(tmplDir, "template"), os.ModePerm); err != nil {
+	// Template directories
+	pkgPath := filepath.Join(tmplDir, "template", "{{upper package}}")
+	if err := os.MkdirAll(pkgPath, os.ModePerm); err != nil {
 		panic(err)
 	}
+	fi, err = os.Create(filepath.Join(pkgPath, ".keep"))
+	if err != nil {
+		panic(err)
+	}
+	if err := fi.Close(); err != nil {
+		panic(err)
+	}
+
+	// Template file
 	fi, err = os.Create(filepath.Join(tmplDir, "template", "TEST"))
 	if err != nil {
 		panic(err)

@@ -1,18 +1,16 @@
 package registry
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 	"text/template"
 	"time"
 
-	"github.com/AlecAivazis/survey/v2"
 	"github.com/mholt/archiver/v3"
-	"github.com/pelletier/go-toml"
 )
 
 // Template is a tmpl project
@@ -36,7 +34,7 @@ func (t *Template) ArchivePath() string {
 }
 
 // Execute runs the Template and copies to dest
-func (t *Template) Execute(dest string, defaults bool) error {
+func (t *Template) Execute(dest string, defaults, overwrite bool) error {
 	tmp, err := ioutil.TempDir(os.TempDir(), "tmpl")
 	if err != nil {
 		return err
@@ -47,10 +45,12 @@ func (t *Template) Execute(dest string, defaults bool) error {
 		return err
 	}
 
-	vars, err := prompt(tmp, defaults)
+	prompts, err := prompt(tmp, defaults)
 	if err != nil {
 		return err
 	}
+
+	funcs := mergeMaps(funcMap, prompts.ToFuncMap())
 
 	base := filepath.Join(tmp, "template")
 	return filepath.Walk(base, func(walkPath string, walkInfo os.FileInfo, walkErr error) error {
@@ -67,13 +67,19 @@ func (t *Template) Execute(dest string, defaults bool) error {
 			return err
 		}
 
-		tmpl, err := template.New("tmpl").Funcs(mergeMaps(funcMap, convertMap(vars))).Parse(string(contents))
+		newDest := strings.TrimPrefix(walkPath, base+"/")
+		newDest = filepath.Join(dest, newDest)
+
+		tmplDest, err := template.New("dest").Funcs(funcs).Parse(newDest)
 		if err != nil {
 			return err
 		}
 
-		newDest := strings.TrimPrefix(walkPath, base+"/")
-		newDest = filepath.Join(dest, newDest)
+		var buf bytes.Buffer
+		if err := tmplDest.Execute(&buf, prompts.ToMap()); err != nil {
+			return err
+		}
+		newDest = buf.String()
 
 		if err := os.MkdirAll(filepath.Dir(newDest), os.ModePerm); err != nil {
 			return err
@@ -83,77 +89,27 @@ func (t *Template) Execute(dest string, defaults bool) error {
 		if err != nil {
 			return err
 		}
+
+		// Check if new file exists. If it does, only skip if not overwriting
+		if _, err := os.Lstat(newDest); err == nil && !overwrite {
+			return nil
+		}
+
 		newFi, err := os.OpenFile(newDest, os.O_RDWR|os.O_CREATE|os.O_TRUNC, oldFi.Mode())
 		if err != nil {
 			return err
 		}
 
-		if err := tmpl.Execute(newFi, vars); err != nil {
+		tmplContents, err := template.New("tmpl").Funcs(funcs).Parse(string(contents))
+		if err != nil {
+			return err
+		}
+		if err := tmplContents.Execute(newFi, prompts.ToMap()); err != nil {
 			return err
 		}
 
 		return newFi.Close()
 	})
-}
-
-func prompt(dir string, defaults bool) (map[string]interface{}, error) {
-	templatePath := filepath.Join(dir, "template.toml")
-	if _, err := os.Lstat(templatePath); err != nil {
-		return nil, err
-	}
-
-	tree, err := toml.LoadFile(templatePath)
-	if err != nil {
-		return nil, err
-	}
-	vars := tree.ToMap()
-
-	// Return early if we only want defaults
-	if defaults {
-		return vars, nil
-	}
-
-	// Sort the map keys so they are consistent
-	sorted := make([]string, 0, len(vars))
-	for k := range vars {
-		sorted = append(sorted, k)
-	}
-	sort.Strings(sorted)
-
-	for _, k := range sorted {
-		v := vars[k]
-		var p survey.Prompt
-		switch t := v.(type) {
-		case []string:
-			p = &survey.Select{
-				Message: k,
-				Options: t,
-			}
-		default:
-			p = &survey.Input{
-				Message: k,
-				Default: fmt.Sprintf("%v", t),
-			}
-		}
-		var a string
-		if err := survey.AskOne(p, &a); err != nil {
-			return nil, err
-		}
-		vars[k] = a
-	}
-
-	return vars, nil
-}
-
-func convertMap(m map[string]interface{}) template.FuncMap {
-	mm := make(template.FuncMap)
-	for k, v := range m {
-		vv := v // Enclosures in a loop
-		mm[k] = func() interface{} {
-			return fmt.Sprintf("%v", vv)
-		}
-	}
-	return mm
 }
 
 func mergeMaps(maps ...map[string]interface{}) map[string]interface{} {

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"path/filepath"
 
 	"go.jolheiser.com/tmpl/cmd/flags"
@@ -15,12 +14,13 @@ var Save = &cli.Command{
 	Name:        "save",
 	Usage:       "Save a local template",
 	Description: "Save a local template to the registry",
+	ArgsUsage:   "[path] [name]",
 	Action:      runSave,
 }
 
 func runSave(ctx *cli.Context) error {
 	if ctx.NArg() < 2 {
-		return errors.New("<path> <name>")
+		return cli.ShowCommandHelp(ctx, ctx.Command.Name)
 	}
 
 	reg, err := registry.Open(flags.Registry)

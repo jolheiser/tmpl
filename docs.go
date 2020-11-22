@@ -13,7 +13,7 @@ import (
 func main() {
 	app := cmd.NewApp()
 
-	fi, err := os.Create("DOCS.md")
+	fi, err := os.Create("CLI.md")
 	if err != nil {
 		panic(err)
 	}

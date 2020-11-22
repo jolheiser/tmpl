@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"text/tabwriter"
@@ -37,6 +36,7 @@ var (
 		Name:        "add",
 		Usage:       "Add a source",
 		Description: "Add a new source to the registry",
+		ArgsUsage:   "[base URL] [name]",
 		Action:      runSourceAdd,
 	}
 
@@ -44,6 +44,7 @@ var (
 		Name:        "remove",
 		Usage:       "Remove a source",
 		Description: "Remove a source from the registry",
+		ArgsUsage:   "[name]",
 		Action:      runSourceRemove,
 	}
 )
@@ -68,7 +69,7 @@ func runSourceList(_ *cli.Context) error {
 
 func runSourceAdd(ctx *cli.Context) error {
 	if ctx.NArg() < 2 {
-		return errors.New("<repo> <name>")
+		return cli.ShowCommandHelp(ctx, ctx.Command.Name)
 	}
 
 	reg, err := registry.Open(flags.Registry)
@@ -87,7 +88,7 @@ func runSourceAdd(ctx *cli.Context) error {
 
 func runSourceRemove(ctx *cli.Context) error {
 	if ctx.NArg() < 1 {
-		return errors.New("<name>")
+		return cli.ShowCommandHelp(ctx, ctx.Command.Name)
 	}
 
 	reg, err := registry.Open(flags.Registry)

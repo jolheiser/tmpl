@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"errors"
-
 	"go.jolheiser.com/tmpl/cmd/flags"
 	"go.jolheiser.com/tmpl/registry"
 
@@ -19,13 +17,23 @@ var Use = &cli.Command{
 			Name:  "defaults",
 			Usage: "Use template defaults",
 		},
+		&cli.BoolFlag{
+			Name:  "force",
+			Usage: "Overwrite existing files",
+		},
 	},
-	Action: runUse,
+	ArgsUsage: "[name] [destination (default: \".\")]",
+	Action:    runUse,
 }
 
 func runUse(ctx *cli.Context) error {
-	if ctx.NArg() < 2 {
-		return errors.New("<name> <dest>")
+	if ctx.NArg() < 1 {
+		return cli.ShowCommandHelp(ctx, ctx.Command.Name)
+	}
+
+	dest := "."
+	if ctx.NArg() >= 2 {
+		dest = ctx.Args().Get(1)
 	}
 
 	reg, err := registry.Open(flags.Registry)
@@ -38,7 +46,7 @@ func runUse(ctx *cli.Context) error {
 		return err
 	}
 
-	if err := tmpl.Execute(ctx.Args().Get(1), ctx.Bool("defaults")); err != nil {
+	if err := tmpl.Execute(dest, ctx.Bool("defaults"), ctx.Bool("force")); err != nil {
 		return err
 	}
 

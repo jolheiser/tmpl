@@ -49,7 +49,8 @@ func runInit(_ *cli.Context) error {
 var comments = `# template.toml
 # Write any template args here to prompt the user for, giving any defaults/options as applicable
 
-name = "MyProject"
-
-lang = ["Go", "Rust", "Python"]
+[name]
+prompt = "Project Name"
+help = "The name to use in the project"
+default = "tmpl"
 `

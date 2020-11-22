@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"errors"
-
 	"go.jolheiser.com/tmpl/cmd/flags"
 	"go.jolheiser.com/tmpl/registry"
 
@@ -14,12 +12,13 @@ var Remove = &cli.Command{
 	Name:        "remove",
 	Usage:       "Remove a template",
 	Description: "Remove a template from the registry",
+	ArgsUsage:   "[name]",
 	Action:      runRemove,
 }
 
 func runRemove(ctx *cli.Context) error {
 	if ctx.NArg() < 1 {
-		return errors.New("<name>")
+		return cli.ShowCommandHelp(ctx, ctx.Command.Name)
 	}
 
 	reg, err := registry.Open(flags.Registry)

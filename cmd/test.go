@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/urfave/cli/v2"
 	"go.jolheiser.com/beaver"
@@ -10,17 +11,23 @@ import (
 var Test = &cli.Command{
 	Name:        "test",
 	Usage:       "Test if a directory is a valid template",
-	Description: "Test whether the current directory is valid for use with tmpl",
+	Description: "Test whether a directory is valid for use with tmpl",
+	ArgsUsage:   "[path (default: \".\")]",
 	Action:      runTest,
 }
 
-func runTest(_ *cli.Context) error {
+func runTest(ctx *cli.Context) error {
+	testPath := "."
+	if ctx.NArg() > 0 {
+		testPath = ctx.Args().First()
+	}
+
 	var errs []string
-	if _, err := os.Lstat("template.toml"); err != nil {
+	if _, err := os.Lstat(filepath.Join(testPath, "template.toml")); err != nil {
 		errs = append(errs, "could not find template.toml")
 	}
 
-	fi, err := os.Lstat("template")
+	fi, err := os.Lstat(filepath.Join(testPath, "template"))
 	if err != nil {
 		errs = append(errs, "no template directory found")
 	}
