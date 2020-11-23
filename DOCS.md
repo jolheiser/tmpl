@@ -11,6 +11,10 @@ A "valid" tmpl template only requires two things
 
 ## template.toml
 
+**NOTE:** The template.toml file will be expanded, though not with the full power of the template itself.  
+The template.toml file will only expand environment variables with syntax `$USER` or `${USER}`.  
+For full documentation on the syntax, see [os.ExpandEnv](https://golang.org/pkg/os/#ExpandEnv).
+
 ```toml
 # Key-value pairs can be simple
 # The user will receive a basic prompt asking them to fill out the variable
@@ -25,7 +29,7 @@ prompt = "The name of the author of this project"
 # help would be extra information (generally seen by giving '?' to a prompt)
 help = "Who will be primarily writing this project"
 # default is the "value" part of the simple pair. This could be a suggested value
-default = "me"
+default = "$USER"
 ```
 
 ## template directory

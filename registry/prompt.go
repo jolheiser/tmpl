@@ -2,6 +2,7 @@ package registry
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -25,7 +26,15 @@ func prompt(dir string, defaults bool) (templatePrompts, error) {
 		return nil, err
 	}
 
-	tree, err := toml.LoadFile(templatePath)
+	templateBytes, err := ioutil.ReadFile(templatePath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Expand the template with environment variables
+	templateContents := os.ExpandEnv(string(templateBytes))
+
+	tree, err := toml.Load(templateContents)
 	if err != nil {
 		return nil, err
 	}

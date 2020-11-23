@@ -12,7 +12,7 @@ var (
 	tmplTemplate = `name = "john olheiser"
 
 [year]
-default = 2020
+default = ${TMPL_TEST}
 
 [package]
 default = "pkg"`
@@ -21,6 +21,12 @@ default = "pkg"`
 )
 
 func testExecute(t *testing.T) {
+	// Set environment variable
+	if err := os.Setenv("TMPL_TEST", "2020"); err != nil {
+		t.Logf("could not set environment: %v", err)
+		t.FailNow()
+	}
+
 	// Get template
 	tmpl, err := reg.GetTemplate("test")
 	if err != nil {
