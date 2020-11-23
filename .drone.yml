@@ -96,8 +96,11 @@ platform:
   arch: amd64
 
 trigger:
-  event:
-    - tag
+  ref:
+    include:
+    - refs/tags/*
+    exclude:
+    - refs/tags/latest
 
 steps:
   - name: build
@@ -119,13 +122,13 @@ steps:
       - make build
   - name: gitea-release
     pull: always
-    image: jolheiser/drone-gitea-main:latest
+    image: plugins/gitea-release:1
     environment:
       GOPROXY: https://goproxy.cn
     settings:
-      token:
+      api_key:
         from_secret: gitea_token
-      base: https://gitea.com
+      base_url: https://gitea.com
       files:
         - "tmpl"
         - "tmpl.exe"
