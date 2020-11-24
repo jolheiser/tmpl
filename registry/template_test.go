@@ -8,14 +8,19 @@ import (
 )
 
 var (
-	tmplContents = `{{title name}} {{.year}}`
-	tmplTemplate = `name = "john olheiser"
+	tmplContents = `{{title name}} {{if .bool}}{{.year}}{{end}}`
+	tmplTemplate = `
+name = "john olheiser"
 
 [year]
-default = ${TMPL_TEST}
+default = ${TMPL_TEST} # 2020
 
 [package]
-default = "pkg"`
+default = "pkg"
+
+[bool]
+default = true
+`
 	tmplGold    = "John Olheiser 2020"
 	tmplNewGold = "DO NOT OVERWRITE!"
 )
