@@ -84,6 +84,18 @@ func prompt(dir string, defaults bool) (templatePrompts, error) {
 				Options: t,
 				Help:    prompt.Help,
 			}
+		case bool:
+			p = &survey.Confirm{
+				Message: prompt.Message,
+				Default: t,
+				Help:    prompt.Help,
+			}
+		case string:
+			p = &survey.Input{
+				Message: prompt.Message,
+				Default: t,
+				Help:    prompt.Help,
+			}
 		default:
 			p = &survey.Input{
 				Message: prompt.Message,
@@ -103,6 +115,7 @@ func prompt(dir string, defaults bool) (templatePrompts, error) {
 
 type templatePrompts []templatePrompt
 
+// ToMap converts a slice to templatePrompt into a suitable template context
 func (t templatePrompts) ToMap() map[string]interface{} {
 	m := make(map[string]interface{})
 	for _, p := range t {
@@ -115,25 +128,29 @@ func (t templatePrompts) ToMap() map[string]interface{} {
 	return m
 }
 
+// ToFuncMap converts a slice of templatePrompt into a suitable template.FuncMap
 func (t templatePrompts) ToFuncMap() template.FuncMap {
 	m := make(map[string]interface{})
 	for k, v := range t.ToMap() {
 		vv := v // Enclosure
-		m[k] = func() string {
-			return fmt.Sprintf("%v", vv)
+		m[k] = func() interface{} {
+			return vv
 		}
 	}
 	return m
 }
 
+// Len is for sort.Sort
 func (t templatePrompts) Len() int {
 	return len(t)
 }
 
+// Less is for sort.Sort
 func (t templatePrompts) Less(i, j int) bool {
 	return t[i].Key > t[j].Key
 }
 
+// Swap is for sort.Sort
 func (t templatePrompts) Swap(i, j int) {
 	t[i], t[j] = t[j], t[i]
 }
