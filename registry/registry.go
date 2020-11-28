@@ -186,6 +186,7 @@ func download(cloneURL, branch, dest string) error {
 		ReferenceName: plumbing.NewBranchReferenceName(branch),
 		SingleBranch:  true,
 		Depth:         1,
+		Progress:      os.Stdout,
 	}); err != nil {
 		return err
 	}

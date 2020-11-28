@@ -17,6 +17,10 @@ fmt:
 test:
 	$(GO) test -race ./...
 
+.PHONY: lint
+lint:
+	earth +lint
+
 .PHONY: docs
 docs:
 	$(GO) run docs.go
