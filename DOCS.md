@@ -109,3 +109,10 @@ I realize that many users will be using GitHub, and most will likely still be us
    2. Set the env variable `TMPL_SOURCE` to `github`
 2. Set the env variable `TMPL_BRANCH` to `master`
 3. Happy templating! `tmpl download user/repo repo`
+
+## Backup and Restore
+
+1. The simplest solution is to make a copy of your `registry.toml` (default: `~/.tmpl/registry.toml`).
+   * Once in the new location, you will need to use `tmpl restore`.
+   
+2. Alternatively, you can copy/paste the entire registry (default: `~/.tmpl`) and skip the restore step.

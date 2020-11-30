@@ -20,7 +20,7 @@ type Template struct {
 	Path       string    `toml:"path"`
 	Repository string    `toml:"repository"`
 	Branch     string    `toml:"branch"`
-	Created    time.Time `toml:"created"`
+	LastUpdate time.Time `toml:"last_update"`
 }
 
 // ArchiveName is the name given to the archive for this Template

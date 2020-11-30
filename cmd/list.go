@@ -25,7 +25,7 @@ func runList(_ *cli.Context) error {
 	}
 
 	wr := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
-	if _, err := fmt.Fprintf(wr, "NAME\tURL\tLOCAL\tUPDATED\n"); err != nil {
+	if _, err := fmt.Fprintf(wr, "NAME\tURL\tLOCAL\tLAST UPDATED\n"); err != nil {
 		return err
 	}
 	for _, t := range reg.Templates {
@@ -35,7 +35,7 @@ func runList(_ *cli.Context) error {
 			u = t.Path
 			local = true
 		}
-		if _, err := fmt.Fprintf(wr, "%s\t%s\t%t\t%s\n", t.Name, u, local, t.Created.Format("01/02/2006")); err != nil {
+		if _, err := fmt.Fprintf(wr, "%s\t%s\t%t\t%s\n", t.Name, u, local, t.LastUpdate.Format("01/02/2006")); err != nil {
 			return err
 		}
 	}
