@@ -2,6 +2,19 @@ package registry
 
 import "fmt"
 
+type ErrTemplateExists struct {
+	Name string
+}
+
+func (e ErrTemplateExists) Error() string {
+	return fmt.Sprintf("template %s already exists", e.Name)
+}
+
+func IsErrTemplateExists(err error) bool {
+	_, ok := err.(ErrTemplateExists)
+	return ok
+}
+
 type ErrTemplateNotFound struct {
 	Name string
 }

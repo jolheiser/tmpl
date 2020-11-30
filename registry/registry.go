@@ -50,6 +50,10 @@ func (r *Registry) GetTemplate(name string) (*Template, error) {
 
 // DownloadTemplate downloads and adds a new Template to the Registry
 func (r *Registry) DownloadTemplate(name, repo, branch string) (*Template, error) {
+	if _, err := r.GetTemplate(name); err == nil {
+		return nil, ErrTemplateExists{Name: name}
+	}
+
 	t := &Template{
 		reg:        r,
 		Name:       name,
@@ -68,6 +72,10 @@ func (r *Registry) DownloadTemplate(name, repo, branch string) (*Template, error
 
 // SaveTemplate saves a local Template to the Registry
 func (r *Registry) SaveTemplate(name, path string) (*Template, error) {
+	if _, err := r.GetTemplate(name); err == nil {
+		return nil, ErrTemplateExists{Name: name}
+	}
+
 	t := &Template{
 		reg:        r,
 		Name:       name,
