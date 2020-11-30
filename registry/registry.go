@@ -50,12 +50,16 @@ func (r *Registry) GetTemplate(name string) (*Template, error) {
 
 // DownloadTemplate downloads and adds a new Template to the Registry
 func (r *Registry) DownloadTemplate(name, repo, branch string) (*Template, error) {
+	if _, err := r.GetTemplate(name); err == nil {
+		return nil, ErrTemplateExists{Name: name}
+	}
+
 	t := &Template{
 		reg:        r,
 		Name:       name,
 		Repository: repo,
 		Branch:     branch,
-		Created:    time.Now(),
+		LastUpdate: time.Now(),
 	}
 	r.Templates = append(r.Templates, t)
 
@@ -68,11 +72,15 @@ func (r *Registry) DownloadTemplate(name, repo, branch string) (*Template, error
 
 // SaveTemplate saves a local Template to the Registry
 func (r *Registry) SaveTemplate(name, path string) (*Template, error) {
+	if _, err := r.GetTemplate(name); err == nil {
+		return nil, ErrTemplateExists{Name: name}
+	}
+
 	t := &Template{
-		reg:     r,
-		Name:    name,
-		Path:    path,
-		Created: time.Now(),
+		reg:        r,
+		Name:       name,
+		Path:       path,
+		LastUpdate: time.Now(),
 	}
 	r.Templates = append(r.Templates, t)
 
@@ -89,16 +97,48 @@ func (r *Registry) RemoveTemplate(name string) error {
 	if err != nil {
 		return err
 	}
+
 	for idx, t := range r.Templates {
 		if strings.EqualFold(name, t.Name) {
 			r.Templates = append(r.Templates[:idx], r.Templates[idx+1:]...)
 			if err := os.Remove(t.ArchivePath()); err != nil {
 				return err
 			}
+			return r.save()
 		}
 	}
 
-	return r.save()
+	return nil
+}
+
+// RemoveTemplate updates the Template on disk and in meta
+func (r *Registry) UpdateTemplate(name string) error {
+	_, err := r.GetTemplate(name)
+	if err != nil {
+		return err
+	}
+
+	for idx, t := range r.Templates {
+		if strings.EqualFold(name, t.Name) {
+			// If the path doesn't exist, we are replacing it regardless
+			if err := os.Remove(t.ArchivePath()); err != nil && !os.IsNotExist(err) {
+				return err
+			}
+
+			// Cut it out of the template list so we don't get a duplicate
+			r.Templates = append(r.Templates[:idx], r.Templates[idx+1:]...)
+
+			// If path exists, it is local
+			if t.Path != "" {
+				_, err = r.SaveTemplate(t.Name, t.Path)
+			} else {
+				_, err = r.DownloadTemplate(t.Name, t.Repository, t.Branch)
+			}
+			return err
+		}
+	}
+
+	return nil
 }
 
 // GetSource retrieves a Source from the Registry
@@ -159,7 +199,16 @@ func Open(dir string) (*Registry, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &reg, tree.Unmarshal(&reg)
+
+	if err := tree.Unmarshal(&reg); err != nil {
+		return nil, err
+	}
+
+	for _, tmpl := range reg.Templates {
+		tmpl.reg = &reg
+	}
+
+	return &reg, nil
 }
 
 func create(regFile string) error {
@@ -191,7 +240,7 @@ func download(cloneURL, branch, dest string) error {
 		return err
 	}
 
-	// RemoveTemplate .git
+	// Remove .git
 	if err := os.RemoveAll(filepath.Join(tmp, ".git")); err != nil {
 		return err
 	}

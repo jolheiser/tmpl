@@ -32,6 +32,10 @@ Download a template
 
 **--branch, -b**="": Branch to clone (default: main)
 
+## env
+
+Show tmpl environment variables
+
 ## init
 
 Initialize a template
@@ -43,6 +47,10 @@ List templates in the registry
 ## remove
 
 Remove a template
+
+## restore
+
+Restore missing templates
 
 ## save
 

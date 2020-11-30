@@ -51,9 +51,11 @@ func NewApp() *cli.App {
 
 	app.Commands = []*cli.Command{
 		Download,
+		Env,
 		Init,
 		List,
 		Remove,
+		Restore,
 		Save,
 		Source,
 		Test,
