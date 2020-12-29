@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"text/template"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -67,15 +68,22 @@ func prompt(dir string, defaults bool) (templatePrompts, error) {
 		prompts[idx] = p
 	}
 
-	// Return early if we only want defaults
-	if defaults {
-		return prompts, nil
-	}
-
 	// Sort the prompts so they are consistent
 	sort.Sort(prompts)
 
 	for idx, prompt := range prompts {
+		// Check for env variable
+		if e, ok := os.LookupEnv(fmt.Sprintf("TMPL_VAR_%s", strings.ToUpper(prompt.Key))); ok {
+			prompts[idx].Value = e
+			continue
+		}
+
+		// Check if we are using defaults
+		if defaults {
+			prompts[idx].Value = prompt.Default
+			continue
+		}
+
 		var p survey.Prompt
 		switch t := prompt.Default.(type) {
 		case []string:
@@ -119,11 +127,7 @@ type templatePrompts []templatePrompt
 func (t templatePrompts) ToMap() map[string]interface{} {
 	m := make(map[string]interface{})
 	for _, p := range t {
-		if p.Value != nil {
-			m[p.Key] = p.Value
-			continue
-		}
-		m[p.Key] = p.Default
+		m[p.Key] = p.Value
 	}
 	return m
 }

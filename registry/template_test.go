@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	tmplContents = `{{title name}} {{if .bool}}{{.year}}{{end}}`
+	tmplContents = `{{title name}} (@{{username}}) {{if .bool}}{{.year}}{{end}}`
 	tmplTemplate = `
 name = "john olheiser"
 
@@ -20,14 +20,21 @@ default = "pkg"
 
 [bool]
 default = true
+
+[username]
+default = "username"
 `
-	tmplGold    = "John Olheiser 2020"
+	tmplGold    = "John Olheiser (@jolheiser) 2020"
 	tmplNewGold = "DO NOT OVERWRITE!"
 )
 
 func testExecute(t *testing.T) {
 	// Set environment variable
 	if err := os.Setenv("TMPL_TEST", "2020"); err != nil {
+		t.Logf("could not set environment: %v", err)
+		t.FailNow()
+	}
+	if err := os.Setenv("TMPL_VAR_USERNAME", "jolheiser"); err != nil {
 		t.Logf("could not set environment: %v", err)
 		t.FailNow()
 	}

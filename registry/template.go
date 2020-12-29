@@ -67,7 +67,7 @@ func (t *Template) Execute(dest string, defaults, overwrite bool) error {
 			return err
 		}
 
-		newDest := strings.TrimPrefix(walkPath, base+"/")
+		newDest := strings.TrimPrefix(walkPath, base+string(filepath.Separator))
 		newDest = filepath.Join(dest, newDest)
 
 		tmplDest, err := template.New("dest").Funcs(funcs).Parse(newDest)

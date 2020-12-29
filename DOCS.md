@@ -15,6 +15,10 @@ A "valid" tmpl template only requires two things
 The template.toml file will only expand environment variables with syntax `$USER` or `${USER}`.  
 For full documentation on the syntax, see [os.ExpandEnv](https://golang.org/pkg/os/#ExpandEnv).
 
+When using the `--defaults` flag, no prompts will be shown and only default values will be used.  
+As another alternative, any environment variable that matches a key will bypass the prompt.  
+For example, `author` would have the corresponding environment variable `TMPL_VAR_AUTHOR`.
+
 ```toml
 # Key-value pairs can be simple
 # The user will receive a basic prompt asking them to fill out the variable

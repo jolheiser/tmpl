@@ -17,7 +17,7 @@ var (
 
 func TestMain(m *testing.M) {
 	var err error
-	destDir, err = ioutil.TempDir(os.TempDir(), "tmpl")
+	destDir, err = ioutil.TempDir(os.TempDir(), "tmpl-dest")
 	if err != nil {
 		panic(err)
 	}
@@ -75,7 +75,7 @@ func testGetFail(t *testing.T) {
 
 func setupTemplate() {
 	var err error
-	tmplDir, err = ioutil.TempDir(os.TempDir(), "tmpl")
+	tmplDir, err = ioutil.TempDir(os.TempDir(), "tmpl-setup")
 	if err != nil {
 		panic(err)
 	}
@@ -122,7 +122,7 @@ func setupTemplate() {
 
 func setupRegistry() {
 	var err error
-	regDir, err = ioutil.TempDir(os.TempDir(), "tmpl")
+	regDir, err = ioutil.TempDir(os.TempDir(), "tmpl-reg")
 	if err != nil {
 		panic(err)
 	}
