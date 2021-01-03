@@ -120,3 +120,12 @@ I realize that many users will be using GitHub, and most will likely still be us
    * Once in the new location, you will need to use `tmpl restore`.
    
 2. Alternatively, you can copy/paste the entire registry (default: `~/.tmpl`) and skip the restore step.
+
+## `.tmplkeep`
+
+Perhaps you are familiar with `.gitkeep` and its unofficial status in git. Git does not like empty directories, so usually
+a `.gitkeep` (or just `.keep`) file is added to retain the directory while keeping it effectively empty.
+
+tmpl instead uses `.tmplkeep` files for this purpose. The difference is, tmpl will **not** create the `.tmplkeep` file
+when the template is executed. This allows you to set up directory structures (for staging, examples, etc.) that
+will *actually* be empty after execution.
