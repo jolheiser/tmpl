@@ -85,6 +85,11 @@ func (t *Template) Execute(dest string, defaults, overwrite bool) error {
 			return err
 		}
 
+		// Skip .tmplkeep files, after creating the directory structure
+		if strings.EqualFold(walkInfo.Name(), ".tmplkeep") {
+			return nil
+		}
+
 		oldFi, err := os.Lstat(walkPath)
 		if err != nil {
 			return err

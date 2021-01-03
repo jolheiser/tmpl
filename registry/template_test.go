@@ -72,6 +72,13 @@ func testExecute(t *testing.T) {
 		t.FailNow()
 	}
 
+	// Check for .tmplkeep
+	tmplKeep := filepath.Join(pkgPath, ".tmplkeep")
+	if _, err := os.Lstat(tmplKeep); err == nil {
+		t.Logf(".tmplkeep files should NOT be retained upon execution: %s\n", tmplKeep)
+		t.FailNow()
+	}
+
 	// Change file to test non-overwrite
 	if err := ioutil.WriteFile(testPath, []byte(tmplNewGold), os.ModePerm); err != nil {
 		t.Logf("could not write file: %v\n", err)

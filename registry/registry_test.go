@@ -98,7 +98,8 @@ func setupTemplate() {
 	if err := os.MkdirAll(pkgPath, os.ModePerm); err != nil {
 		panic(err)
 	}
-	fi, err = os.Create(filepath.Join(pkgPath, ".keep"))
+	// .tmplkeep file
+	fi, err = os.Create(filepath.Join(pkgPath, ".tmplkeep"))
 	if err != nil {
 		panic(err)
 	}
