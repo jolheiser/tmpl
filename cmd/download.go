@@ -7,8 +7,8 @@ import (
 	"go.jolheiser.com/tmpl/cmd/flags"
 	"go.jolheiser.com/tmpl/registry"
 
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
-	"go.jolheiser.com/beaver"
 )
 
 var Download = &cli.Command{
@@ -64,6 +64,6 @@ func runDownload(ctx *cli.Context) error {
 		return err
 	}
 
-	beaver.Infof("Added new template %s", t.Name)
+	log.Info().Msgf("Added new template %q", t.Name)
 	return nil
 }

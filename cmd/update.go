@@ -4,8 +4,8 @@ import (
 	"go.jolheiser.com/tmpl/cmd/flags"
 	"go.jolheiser.com/tmpl/registry"
 
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
-	"go.jolheiser.com/beaver"
 )
 
 var Update = &cli.Command{
@@ -35,6 +35,6 @@ func runUpdate(ctx *cli.Context) error {
 		return err
 	}
 
-	beaver.Infof("Successfully updated %s", tmpl.Name)
+	log.Info().Msgf("Successfully updated %q", tmpl.Name)
 	return nil
 }

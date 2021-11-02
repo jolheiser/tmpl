@@ -4,8 +4,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
-	"go.jolheiser.com/beaver"
 )
 
 var Test = &cli.Command{
@@ -37,10 +37,10 @@ func runTest(ctx *cli.Context) error {
 
 	if len(errs) > 0 {
 		for _, err := range errs {
-			beaver.Error(err)
+			log.Error().Msg(err)
 		}
 		return nil
 	}
-	beaver.Info("this is a valid tmpl template")
+	log.Info().Msg("this is a valid tmpl template")
 	return nil
 }

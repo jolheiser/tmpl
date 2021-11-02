@@ -6,8 +6,8 @@ import (
 	"go.jolheiser.com/tmpl/cmd/flags"
 	"go.jolheiser.com/tmpl/registry"
 
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
-	"go.jolheiser.com/beaver"
 )
 
 var Restore = &cli.Command{
@@ -26,7 +26,7 @@ func runRestore(_ *cli.Context) error {
 	var num int
 	for _, tmpl := range reg.Templates {
 		if _, err := os.Lstat(tmpl.ArchivePath()); os.IsNotExist(err) {
-			beaver.Infof("Restoring %s...", tmpl.Name)
+			log.Info().Msgf("Restoring %q...", tmpl.Name)
 			if err := reg.UpdateTemplate(tmpl.Name); err != nil {
 				return err
 			}
@@ -34,6 +34,6 @@ func runRestore(_ *cli.Context) error {
 		}
 	}
 
-	beaver.Infof("Restored %d templates.", num)
+	log.Info().Int("count", num).Msgf("Restored templates.")
 	return nil
 }

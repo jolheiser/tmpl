@@ -3,9 +3,8 @@ package cmd
 import (
 	"os"
 
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
-	"go.jolheiser.com/beaver"
-	"go.jolheiser.com/beaver/color"
 )
 
 var Env = &cli.Command{
@@ -18,17 +17,15 @@ var Env = &cli.Command{
 func runEnv(_ *cli.Context) error {
 
 	// Source
-	beaver.Infof("TMPL_SOURCE: %s", getEnv("TMPL_SOURCE"))
+	log.Info().Str("TMPL_SOURCE", os.Getenv("TMPL_SOURCE")).Msg("")
 
 	// Registry Path
-	beaver.Infof("TMPL_REGISTRY: %s", getEnv("TMPL_REGISTRY"))
+	log.Info().Str("TMPL_REGISTRY", os.Getenv("TMPL_REGISTRY")).Msg("")
 
 	// Branch
-	beaver.Infof("TMPL_BRANCH: %s", getEnv("TMPL_BRANCH"))
+	log.Info().Str("TMPL_BRANCH", os.Getenv("TMPL_BRANCH")).Msg("")
 
 	return nil
 }
 
-func getEnv(key string) string {
-	return color.FgHiBlue.Format(os.Getenv(key))
-}
+

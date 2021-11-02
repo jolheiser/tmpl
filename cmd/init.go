@@ -4,8 +4,8 @@ import (
 	"errors"
 	"os"
 
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
-	"go.jolheiser.com/beaver"
 )
 
 var Init = &cli.Command{
@@ -42,7 +42,7 @@ func runInit(_ *cli.Context) error {
 	if err := os.Mkdir("template", os.ModePerm); err != nil {
 		return err
 	}
-	beaver.Info("Template initialized!")
+	log.Info().Msg("Template initialized!")
 	return fi.Close()
 }
 

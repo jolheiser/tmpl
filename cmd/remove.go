@@ -4,8 +4,8 @@ import (
 	"go.jolheiser.com/tmpl/cmd/flags"
 	"go.jolheiser.com/tmpl/registry"
 
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
-	"go.jolheiser.com/beaver"
 )
 
 var Remove = &cli.Command{
@@ -30,6 +30,6 @@ func runRemove(ctx *cli.Context) error {
 		return err
 	}
 
-	beaver.Infof("Successfully removed %s", ctx.Args().First())
+	log.Info().Msgf("Successfully removed %q", ctx.Args().First())
 	return nil
 }

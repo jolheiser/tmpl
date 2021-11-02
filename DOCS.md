@@ -102,7 +102,7 @@ Alternatively, you can specify on the command-line with the `--branch` flag of t
 ```
 tmpl --source gitea download --branch license jolheiser/tmpls license
 ```
-The above command would download the [license](https://gitea.com/jolheiser/tmpls/src/branch/license) template from `jolheiser/tmpls`
+The above command would download the [license](https://git.jojodev.com/jolheiser/tmpls/src/branch/license) template from `jolheiser/tmpls`
 
 ## Putting it all together
 

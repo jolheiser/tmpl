@@ -1,0 +1,59 @@
+clone:
+  git:
+    image: woodpeckerci/plugin-git:next
+
+pipeline:
+  compliance:
+    image: golang:1.17
+    commands:
+      - go test -race ./...
+      - go vet ./...
+      - go run github.com/rs/zerolog/cmd/lint go.jolheiser.com/tmpl
+      - go build
+    when:
+      event: pull_request
+
+  build:
+    image: golang:1.17
+    commands:
+      - GOOS="windows" go build
+      - GOOS="linux" go build
+    when:
+      event: [ push, tag ]
+      branch: main
+
+  release-main:
+    image: jolheiser/drone-gitea-main:latest
+    secrets:
+      - source: gitea_token
+        target: token
+    base: https://git.jojodev.com
+    files:
+      - "tmpl"
+      - "tmpl.exe"
+    when:
+      event: push
+      branch: main
+
+  release-tag:
+    image: plugins/gitea-release:1
+    secrets:
+      - source: gitea_token
+        target: api_key
+    base_url: https://git.jojodev.com
+    files:
+      - "tmpl"
+      - "tmpl.exe"
+    when:
+      event: tag
+      tag: v*
+
+  prune:
+    image: jolheiser/drone-gitea-prune
+    secrets:
+      - source: gitea_token
+        target: token
+    base: https://git.jojodev.com
+    when:
+      event: tag
+      tag: v*

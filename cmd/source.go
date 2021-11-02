@@ -8,8 +8,8 @@ import (
 	"go.jolheiser.com/tmpl/cmd/flags"
 	"go.jolheiser.com/tmpl/registry"
 
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
-	"go.jolheiser.com/beaver"
 )
 
 var (
@@ -82,7 +82,7 @@ func runSourceAdd(ctx *cli.Context) error {
 		return err
 	}
 
-	beaver.Infof("Added new source %s", s.Name)
+	log.Info().Msgf("Added new source %q", s.Name)
 	return nil
 }
 
@@ -100,6 +100,6 @@ func runSourceRemove(ctx *cli.Context) error {
 		return err
 	}
 
-	beaver.Infof("Successfully removed source for %s", ctx.Args().First())
+	log.Info().Msgf("Successfully removed source for %q", ctx.Args().First())
 	return nil
 }

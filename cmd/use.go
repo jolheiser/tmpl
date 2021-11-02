@@ -4,8 +4,8 @@ import (
 	"go.jolheiser.com/tmpl/cmd/flags"
 	"go.jolheiser.com/tmpl/registry"
 
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
-	"go.jolheiser.com/beaver"
 )
 
 var Use = &cli.Command{
@@ -50,6 +50,6 @@ func runUse(ctx *cli.Context) error {
 		return err
 	}
 
-	beaver.Infof("Successfully executed %s", tmpl.Name)
+	log.Info().Msgf("Successfully executed %q", tmpl.Name)
 	return nil
 }

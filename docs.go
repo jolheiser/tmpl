@@ -1,3 +1,4 @@
+//go:build docs
 // +build docs
 
 package main
@@ -10,6 +11,7 @@ import (
 	"go.jolheiser.com/tmpl/cmd"
 )
 
+//go:generate go run docs.go
 func main() {
 	app := cmd.NewApp()
 

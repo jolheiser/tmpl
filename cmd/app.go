@@ -6,8 +6,8 @@ import (
 
 	"go.jolheiser.com/tmpl/cmd/flags"
 
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
-	"go.jolheiser.com/beaver"
 )
 
 var (
@@ -18,7 +18,7 @@ var (
 func init() {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		beaver.Error("could not locate user's home directory, tmpl will use temp dir for registry")
+		log.Error().Msg("could not locate user's home directory, tmpl will use temp dir for registry")
 		return
 	}
 	defaultDir = filepath.Join(home, ".tmpl")

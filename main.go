@@ -5,14 +5,15 @@ import (
 
 	"go.jolheiser.com/tmpl/cmd"
 
-	"go.jolheiser.com/beaver"
-	"go.jolheiser.com/beaver/color"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
 	app := cmd.NewApp()
-	color.Fatal = color.Error // Easier to read, doesn't need to stand out as much in a CLI
 	if err := app.Run(os.Args); err != nil {
-		beaver.Fatal(err)
+		log.Fatal().Err(err).Msg("")
 	}
 }

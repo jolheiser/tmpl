@@ -12,7 +12,7 @@ The two projects share many similarities, however other than general layout/stru
 
 ## Examples 
 
-Check out the [license](https://gitea.com/jolheiser/tmpls/src/branch/license) and [makefile](https://gitea.com/jolheiser/tmpls/src/branch/makefile) branch of my [template repository](https://gitea.com/jolheiser/tmpls). 
+Check out the [license](https://git.jojodev.com/jolheiser/tmpls/src/branch/license) and [makefile](https://git.jojodev.com/jolheiser/tmpls/src/branch/makefile) branch of my [template repository](https://git.jojodev.com/jolheiser/tmpls). 
 
 ## License
 
