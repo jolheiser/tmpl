@@ -26,7 +26,7 @@ pipeline:
     image: jolheiser/drone-gitea-main:latest
     secrets:
       - source: gitea_token
-        target: token
+        target: plugin_token
     base: https://git.jojodev.com
     files:
       - "tmpl"
@@ -39,7 +39,7 @@ pipeline:
     image: plugins/gitea-release:1
     secrets:
       - source: gitea_token
-        target: api_key
+        target: plugin_token
     base_url: https://git.jojodev.com
     files:
       - "tmpl"
@@ -52,7 +52,7 @@ pipeline:
     image: jolheiser/drone-gitea-prune
     secrets:
       - source: gitea_token
-        target: token
+        target: plugin_token
     base: https://git.jojodev.com
     when:
       event: tag
