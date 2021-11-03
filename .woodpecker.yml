@@ -39,7 +39,7 @@ pipeline:
     image: plugins/gitea-release:1
     secrets:
       - source: gitea_token
-        target: plugin_token
+        target: plugin_api_key
     base_url: https://git.jojodev.com
     files:
       - "tmpl"
