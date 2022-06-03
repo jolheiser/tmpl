@@ -1,0 +1,25 @@
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    ldflags:
+      - "-s -w -X go.jolheiser.com/tmpl/cmd.Version={{.Version}}"
+archives:
+  - replacements:
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+checksum:
+  name_template: 'checksums.txt'
+release:
+  gitea:
+    owner: jolheiser
+    name: tmpl
+gitea_urls:
+  api: https://git.jojodev.com/api/v1/
+  download: https://git.jojodev.com

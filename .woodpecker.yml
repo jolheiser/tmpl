@@ -1,59 +1,39 @@
 clone:
   git:
-    image: woodpeckerci/plugin-git:next
+    image: woodpeckerci/plugin-git
+    settings:
+      tags: true
 
 pipeline:
   compliance:
-    image: golang:1.17
+    image: golang:1.18
     commands:
       - go test -race ./...
       - go vet ./...
-      - go run github.com/rs/zerolog/cmd/lint go.jolheiser.com/tmpl
-      - go build
+      - go run github.com/rs/zerolog/cmd/lint@latest go.jolheiser.com/tmpl
     when:
       event: pull_request
 
   build:
-    image: golang:1.17
+    image: goreleaser/goreleaser
     commands:
-      - GOOS="windows" go build
-      - GOOS="linux" go build
+      - goreleaser build --snapshot
     when:
-      event: [ push, tag ]
-      branch: main
+      event: pull_request
 
-  release-main:
-    image: jolheiser/drone-gitea-main:latest
-    secrets:
-      - source: gitea_token
-        target: plugin_token
-    base: https://git.jojodev.com
-    files:
-      - "tmpl"
-      - "tmpl.exe"
-    when:
-      event: push
-      branch: main
-
-  release-tag:
-    image: plugins/gitea-release:1
-    secrets:
-      - source: gitea_token
-        target: plugin_api_key
-    base_url: https://git.jojodev.com
-    files:
-      - "tmpl"
-      - "tmpl.exe"
+  release:
+    image: goreleaser/goreleaser
+    commands:
+      - goreleaser release
+    secrets: [ gitea_token ]
     when:
       event: tag
-      tag: v*
 
   prune:
     image: jolheiser/drone-gitea-prune
-    secrets:
-      - source: gitea_token
-        target: plugin_token
-    base: https://git.jojodev.com
+    settings:
+      base: https://git.jojodev.com
+      token:
+        from_secret: gitea_token
     when:
       event: tag
-      tag: v*
