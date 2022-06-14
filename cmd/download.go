@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"go.jolheiser.com/tmpl/env"
 	"go.jolheiser.com/tmpl/registry"
 
 	"github.com/rs/zerolog/log"
@@ -34,6 +35,14 @@ func runDownload(ctx *cli.Context) error {
 
 	reg, err := registry.Open(registryFlag)
 	if err != nil {
+		return err
+	}
+
+	e, err := env.Load(registryFlag)
+	if err != nil {
+		return err
+	}
+	if err := e.Set(); err != nil {
 		return err
 	}
 
