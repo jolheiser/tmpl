@@ -1,11 +1,14 @@
 package registry
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/matryer/is"
 )
 
 func TestSource(t *testing.T) {
+	assert := is.New(t)
+
 	tt := []struct {
 		Name     string
 		Source   *Source
@@ -38,10 +41,7 @@ func TestSource(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
 			cloneURL := tc.Source.CloneURL(namespace)
-			if !strings.EqualFold(tc.CloneURL, cloneURL) {
-				t.Logf("incorrect clone URL:\n\tExpected: %s\n\tGot: %s\n", tc.CloneURL, cloneURL)
-				t.Fail()
-			}
+			assert.Equal(tc.CloneURL, cloneURL) // Clone URLs should match
 		})
 	}
 }

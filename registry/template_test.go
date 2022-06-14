@@ -5,99 +5,74 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/matryer/is"
 )
 
 var (
-	tmplContents = `{{title name}} (@{{username}}) {{if .bool}}{{.year}}{{end}}`
+	tmplContents = `{{title name}} (@{{username}}) {{if .bool}}{{.year}}{{end}} {{org}}`
 	tmplTemplate = `
-name = "john olheiser"
-
-[year]
-default = ${TMPL_TEST} # 2020
-
-[package]
-default = "pkg"
-
-[bool]
-default = true
-
-[username]
-default = "username"
+prompts:
+  - id: name
+    default: john olheiser
+  - id: year
+    default: ${TMPL_TEST} # 2020
+  - id: package
+    default: pkg
+  - id: bool
+    default: true
+  - id: username
+    default: username
+  - id: org
+    default: ${TMPL_PROMPT_USERNAME}/org
 `
-	tmplGold    = "John Olheiser (@jolheiser) 2020"
+	tmplGold    = "John Olheiser (@jolheiser) 2020 jolheiser/org"
 	tmplNewGold = "DO NOT OVERWRITE!"
 )
 
 func testExecute(t *testing.T) {
+	assert := is.New(t)
+	destDir := t.TempDir()
+
 	// Set environment variable
-	if err := os.Setenv("TMPL_TEST", "2020"); err != nil {
-		t.Logf("could not set environment: %v", err)
-		t.FailNow()
-	}
-	if err := os.Setenv("TMPL_VAR_USERNAME", "jolheiser"); err != nil {
-		t.Logf("could not set environment: %v", err)
-		t.FailNow()
-	}
+	err := os.Setenv("TMPL_TEST", "2020")
+	assert.NoErr(err) // Should set TMPL_TEST env
+
+	err = os.Setenv("TMPL_VAR_USERNAME", "jolheiser")
+	assert.NoErr(err) // Should set TMPL_VAR_USERNAME env
 
 	// Get template
 	tmpl, err := reg.GetTemplate("test")
-	if err != nil {
-		t.Logf("could not get template")
-		t.FailNow()
-	}
+	assert.NoErr(err) // Should get template
 
 	// Execute template
-	if err := tmpl.Execute(destDir, true, true); err != nil {
-		t.Logf("could not execute template: %v\n", err)
-		t.FailNow()
-	}
+	err = tmpl.Execute(destDir, true, true)
+	assert.NoErr(err) // Should execute template
 
 	// Check contents of file
 	testPath := filepath.Join(destDir, "TEST")
 	contents, err := ioutil.ReadFile(testPath)
-	if err != nil {
-		t.Logf("could not read file: %v\n", err)
-		t.FailNow()
-	}
-
-	if string(contents) != tmplGold {
-		t.Logf("contents did not match:\n\tExpected: %s\n\tGot: %s", tmplGold, string(contents))
-		t.FailNow()
-	}
+	assert.NoErr(err)                        // Should be able to read TEST file
+	assert.Equal(string(contents), tmplGold) // Template should match golden file
 
 	// Check if directory was created
 	pkgPath := filepath.Join(destDir, "PKG")
-	if _, err := os.Lstat(pkgPath); err != nil {
-		t.Logf("expected a directory at %s: %v\n", pkgPath, err)
-		t.FailNow()
-	}
+	_, err = os.Lstat(pkgPath)
+	assert.NoErr(err) // PKG directory should exist
 
 	// Check for .tmplkeep
 	tmplKeep := filepath.Join(pkgPath, ".tmplkeep")
-	if _, err := os.Lstat(tmplKeep); err == nil {
-		t.Logf(".tmplkeep files should NOT be retained upon execution: %s\n", tmplKeep)
-		t.FailNow()
-	}
+	_, err = os.Lstat(tmplKeep)
+	assert.True(err != nil) // .tmplkeep file should NOT be retained
 
 	// Change file to test non-overwrite
-	if err := ioutil.WriteFile(testPath, []byte(tmplNewGold), os.ModePerm); err != nil {
-		t.Logf("could not write file: %v\n", err)
-		t.FailNow()
-	}
+	err = ioutil.WriteFile(testPath, []byte(tmplNewGold), os.ModePerm)
+	assert.NoErr(err) // Writing file should succeed
 
-	if err := tmpl.Execute(destDir, true, false); err != nil {
-		t.Logf("could not execute template: %v\n", err)
-		t.FailNow()
-	}
+	err = tmpl.Execute(destDir, true, false)
+	assert.NoErr(err) // Should execute template
 
-	contents, err = ioutil.ReadFile(testPath)
-	if err != nil {
-		t.Logf("could not read file: %v\n", err)
-		t.FailNow()
-	}
-
-	if string(contents) != tmplNewGold {
-		t.Logf("contents did not match:\n\tExpected: %s\n\tGot: %s", tmplNewGold, string(contents))
-		t.FailNow()
-	}
+	contents, err = os.ReadFile(testPath)
+	assert.NoErr(err)                           // Should be able to read file
+	assert.Equal(string(contents), tmplNewGold) // Template should match new golden file
 }

@@ -11,14 +11,14 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/mholt/archiver/v3"
-	"github.com/pelletier/go-toml"
+	"gopkg.in/yaml.v3"
 )
 
 // Registry is a collection of Template
 type Registry struct {
 	dir       string
-	Sources   []*Source   `toml:"sources"`
-	Templates []*Template `toml:"templates"`
+	Sources   []*Source   `yaml:"sources"`
+	Templates []*Template `yaml:"templates"`
 }
 
 func (r *Registry) save() error {
@@ -26,7 +26,7 @@ func (r *Registry) save() error {
 	if err != nil {
 		return err
 	}
-	if err := toml.NewEncoder(fi).Encode(r); err != nil {
+	if err := yaml.NewEncoder(fi).Encode(r); err != nil {
 		return err
 	}
 	return fi.Close()
@@ -34,7 +34,7 @@ func (r *Registry) save() error {
 
 // MetaFilePath is the path to the Registry meta-file
 func (r *Registry) MetaFilePath() string {
-	return filepath.Join(r.dir, "registry.toml")
+	return filepath.Join(r.dir, "registry.yaml")
 }
 
 // GetTemplate retrieves a Template from the Registry
@@ -111,7 +111,7 @@ func (r *Registry) RemoveTemplate(name string) error {
 	return nil
 }
 
-// RemoveTemplate updates the Template on disk and in meta
+// UpdateTemplate updates the Template on disk and in meta
 func (r *Registry) UpdateTemplate(name string) error {
 	_, err := r.GetTemplate(name)
 	if err != nil {
@@ -195,12 +195,12 @@ func Open(dir string) (*Registry, error) {
 		}
 	}
 
-	tree, err := toml.LoadFile(reg.MetaFilePath())
+	contents, err := os.ReadFile(reg.MetaFilePath())
 	if err != nil {
 		return nil, err
 	}
 
-	if err := tree.Unmarshal(&reg); err != nil {
+	if err := yaml.Unmarshal(contents, &reg); err != nil {
 		return nil, err
 	}
 
@@ -254,9 +254,8 @@ func download(cloneURL, branch, dest string) error {
 }
 
 func save(source, dest string) error {
-
 	// Make sure it's a valid template
-	if _, err := os.Lstat(filepath.Join(source, "template.toml")); err != nil {
+	if _, err := os.Lstat(filepath.Join(source, "tmpl.yaml")); err != nil {
 		return err
 	}
 	fi, err := os.Lstat(filepath.Join(source, "template"))

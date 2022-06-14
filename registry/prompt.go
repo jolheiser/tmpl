@@ -2,112 +2,97 @@ package registry
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 	"text/template"
 
+	"go.jolheiser.com/tmpl/config"
+
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/pelletier/go-toml"
 )
 
-type templatePrompt struct {
-	Key     string      `toml:"-"`
-	Value   interface{} `toml:"-"`
-	Message string      `toml:"prompt"`
-	Help    string      `toml:"help"`
-	Default interface{} `toml:"default"`
-}
-
 func prompt(dir string, defaults bool) (templatePrompts, error) {
-	templatePath := filepath.Join(dir, "template.toml")
-	if _, err := os.Lstat(templatePath); err != nil {
+	templatePath := filepath.Join(dir, "tmpl.yaml")
+	fi, err := os.Open(templatePath)
+	if err != nil {
 		return nil, err
 	}
+	defer fi.Close()
 
-	templateBytes, err := ioutil.ReadFile(templatePath)
+	cfg, err := config.Load(fi)
 	if err != nil {
 		return nil, err
 	}
 
-	// Expand the template with environment variables
-	templateContents := os.ExpandEnv(string(templateBytes))
-
-	tree, err := toml.Load(templateContents)
-	if err != nil {
-		return nil, err
+	prompts := make(templatePrompts, 0, len(cfg.Prompts))
+	for _, prompt := range cfg.Prompts {
+		tp := templatePrompt{
+			Prompt: prompt,
+		}
+		if tp.Label == "" {
+			tp.Label = tp.ID
+		}
+		if tp.Default == nil {
+			tp.Default = ""
+		}
+		prompts = append(prompts, tp)
 	}
-
-	prompts := make(templatePrompts, len(tree.Keys()))
-	for idx, k := range tree.Keys() {
-		v := tree.Get(k)
-
-		obj, ok := v.(*toml.Tree)
-		if !ok {
-			prompts[idx] = templatePrompt{
-				Key:     k,
-				Message: k,
-				Default: v,
-			}
-			continue
-		}
-
-		var p templatePrompt
-		if err := obj.Unmarshal(&p); err != nil {
-			return nil, err
-		}
-		p.Key = k
-		if p.Message == "" {
-			p.Message = p.Key
-		}
-		if p.Default == nil {
-			p.Default = ""
-		}
-		prompts[idx] = p
-	}
-
-	// Sort the prompts so they are consistent
-	sort.Sort(prompts)
 
 	for idx, prompt := range prompts {
 		// Check for env variable
-		if e, ok := os.LookupEnv(fmt.Sprintf("TMPL_VAR_%s", strings.ToUpper(prompt.Key))); ok {
+		envKey := strings.ToUpper(prompt.ID)
+		if e, ok := os.LookupEnv(fmt.Sprintf("TMPL_VAR_%s", envKey)); ok {
 			prompts[idx].Value = e
+			os.Setenv(fmt.Sprintf("TMPL_PROMPT_%s", envKey), e)
 			continue
 		}
 
 		// Check if we are using defaults
 		if defaults {
-			prompts[idx].Value = prompt.Default
+			val := prompt.Default
+			switch t := prompt.Default.(type) {
+			case []string:
+				for idy, s := range t {
+					t[idy] = os.ExpandEnv(s)
+				}
+				val = t
+			case string:
+				val = os.ExpandEnv(t)
+			}
+			s := fmt.Sprint(val)
+			prompts[idx].Value = s
+			os.Setenv(fmt.Sprintf("TMPL_PROMPT_%s", envKey), s)
 			continue
 		}
 
 		var p survey.Prompt
 		switch t := prompt.Default.(type) {
 		case []string:
+			for idy, s := range t {
+				t[idy] = os.ExpandEnv(s)
+			}
 			p = &survey.Select{
-				Message: prompt.Message,
+				Message: prompt.Label,
 				Options: t,
 				Help:    prompt.Help,
 			}
 		case bool:
 			p = &survey.Confirm{
-				Message: prompt.Message,
+				Message: prompt.Label,
 				Default: t,
 				Help:    prompt.Help,
 			}
 		case string:
 			p = &survey.Input{
-				Message: prompt.Message,
-				Default: t,
+				Message: prompt.Label,
+				Default: os.ExpandEnv(t),
 				Help:    prompt.Help,
 			}
 		default:
 			p = &survey.Input{
-				Message: prompt.Message,
-				Default: fmt.Sprintf("%v", t),
+				Message: prompt.Label,
+				Default: fmt.Sprint(t),
 				Help:    prompt.Help,
 			}
 		}
@@ -116,45 +101,36 @@ func prompt(dir string, defaults bool) (templatePrompts, error) {
 			return nil, err
 		}
 		prompts[idx].Value = a
+		os.Setenv(fmt.Sprintf("TMPL_PROMPT_%s", envKey), a)
 	}
 
 	return prompts, nil
 }
 
+type templatePrompt struct {
+	config.Prompt
+	Value string
+}
+
 type templatePrompts []templatePrompt
 
 // ToMap converts a slice to templatePrompt into a suitable template context
-func (t templatePrompts) ToMap() map[string]interface{} {
-	m := make(map[string]interface{})
+func (t templatePrompts) ToMap() map[string]any {
+	m := make(map[string]any)
 	for _, p := range t {
-		m[p.Key] = p.Value
+		m[p.ID] = p.Value
 	}
 	return m
 }
 
 // ToFuncMap converts a slice of templatePrompt into a suitable template.FuncMap
 func (t templatePrompts) ToFuncMap() template.FuncMap {
-	m := make(map[string]interface{})
+	m := make(map[string]any)
 	for k, v := range t.ToMap() {
 		vv := v // Enclosure
-		m[k] = func() interface{} {
+		m[k] = func() any {
 			return vv
 		}
 	}
 	return m
-}
-
-// Len is for sort.Sort
-func (t templatePrompts) Len() int {
-	return len(t)
-}
-
-// Less is for sort.Sort
-func (t templatePrompts) Less(i, j int) bool {
-	return t[i].Key > t[j].Key
-}
-
-// Swap is for sort.Sort
-func (t templatePrompts) Swap(i, j int) {
-	t[i], t[j] = t[j], t[i]
 }

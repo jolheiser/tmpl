@@ -5,7 +5,6 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"go.jolheiser.com/tmpl/cmd/flags"
 	"go.jolheiser.com/tmpl/registry"
 
 	"github.com/urfave/cli/v2"
@@ -19,7 +18,7 @@ var List = &cli.Command{
 }
 
 func runList(_ *cli.Context) error {
-	reg, err := registry.Open(flags.Registry)
+	reg, err := registry.Open(registryFlag)
 	if err != nil {
 		return err
 	}

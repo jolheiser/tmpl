@@ -16,11 +16,11 @@ var Init = &cli.Command{
 }
 
 func runInit(_ *cli.Context) error {
-	if _, err := os.Lstat("template.toml"); !os.IsNotExist(err) {
+	if _, err := os.Lstat("tmpl.yaml"); !os.IsNotExist(err) {
 		if err != nil {
 			return err
 		}
-		return errors.New("template.toml already detected, aborting initialization")
+		return errors.New("tmpl.yaml already detected, aborting initialization")
 	}
 	if fi, err := os.Lstat("template"); !os.IsNotExist(err) {
 		if err != nil {
@@ -32,7 +32,7 @@ func runInit(_ *cli.Context) error {
 		return errors.New("template directory already detected, aborting initialization")
 	}
 
-	fi, err := os.Create("template.toml")
+	fi, err := os.Create("tmpl.yaml")
 	if err != nil {
 		return err
 	}
@@ -46,11 +46,12 @@ func runInit(_ *cli.Context) error {
 	return fi.Close()
 }
 
-var comments = `# template.toml
+var comments = `# tmpl.yaml
 # Write any template args here to prompt the user for, giving any defaults/options as applicable
 
-[name]
-prompt = "Project Name"
-help = "The name to use in the project"
-default = "tmpl"
+prompts:
+  - id: name                              # The unique ID for the prompt
+    label: Project Name                   # The prompt message/label
+    help: The name to use in the project  # Optional help message for the prompt
+    default: tmpl                         # Prompt default
 `

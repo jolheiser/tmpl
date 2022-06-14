@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"go.jolheiser.com/tmpl/cmd/flags"
+	"go.jolheiser.com/tmpl/env"
 	"go.jolheiser.com/tmpl/registry"
 
 	"github.com/rs/zerolog/log"
@@ -36,8 +36,16 @@ func runUse(ctx *cli.Context) error {
 		dest = ctx.Args().Get(1)
 	}
 
-	reg, err := registry.Open(flags.Registry)
+	reg, err := registry.Open(registryFlag)
 	if err != nil {
+		return err
+	}
+
+	e, err := env.Load(registryFlag)
+	if err != nil {
+		return err
+	}
+	if err := e.Set(); err != nil {
 		return err
 	}
 

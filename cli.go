@@ -11,7 +11,7 @@ import (
 	"go.jolheiser.com/tmpl/cmd"
 )
 
-//go:generate go run docs.go
+//go:generate go run cli.go
 func main() {
 	app := cmd.NewApp()
 

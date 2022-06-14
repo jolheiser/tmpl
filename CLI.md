@@ -11,6 +11,10 @@ tmpl
 [--source|-s]=[value]
 ```
 
+# DESCRIPTION
+
+Template automation
+
 **Usage**:
 
 ```
@@ -35,6 +39,14 @@ Download a template
 ## env
 
 Show tmpl environment variables
+
+### set, add
+
+Set a tmpl environment variable (stored plaintext)
+
+### unset, delete
+
+Unsets a tmpl environment variable
 
 ## init
 

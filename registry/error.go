@@ -23,11 +23,6 @@ func (e ErrTemplateNotFound) Error() string {
 	return fmt.Sprintf("template not found for %s", e.Name)
 }
 
-func IsErrTemplateNotFound(err error) bool {
-	_, ok := err.(ErrTemplateNotFound)
-	return ok
-}
-
 type ErrSourceNotFound struct {
 	Name string
 }

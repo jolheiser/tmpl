@@ -15,12 +15,12 @@ import (
 
 // Template is a tmpl project
 type Template struct {
-	reg        *Registry `toml:"-"`
-	Name       string    `toml:"name"`
-	Path       string    `toml:"path"`
-	Repository string    `toml:"repository"`
-	Branch     string    `toml:"branch"`
-	LastUpdate time.Time `toml:"last_update"`
+	reg        *Registry `yaml:"-"`
+	Name       string    `yaml:"name"`
+	Path       string    `yaml:"path"`
+	Repository string    `yaml:"repository"`
+	Branch     string    `yaml:"branch"`
+	LastUpdate time.Time `yaml:"last_update"`
 }
 
 // ArchiveName is the name given to the archive for this Template
@@ -51,7 +51,6 @@ func (t *Template) Execute(dest string, defaults, overwrite bool) error {
 	}
 
 	funcs := mergeMaps(funcMap, prompts.ToFuncMap())
-
 	base := filepath.Join(tmp, "template")
 	return filepath.Walk(base, func(walkPath string, walkInfo os.FileInfo, walkErr error) error {
 		if walkErr != nil {
@@ -117,8 +116,8 @@ func (t *Template) Execute(dest string, defaults, overwrite bool) error {
 	})
 }
 
-func mergeMaps(maps ...map[string]interface{}) map[string]interface{} {
-	m := make(map[string]interface{})
+func mergeMaps(maps ...map[string]any) map[string]any {
+	m := make(map[string]any)
 	for _, mm := range maps {
 		for k, v := range mm {
 			m[k] = v

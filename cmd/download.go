@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"go.jolheiser.com/tmpl/cmd/flags"
 	"go.jolheiser.com/tmpl/registry"
 
 	"github.com/rs/zerolog/log"
@@ -33,21 +32,21 @@ func runDownload(ctx *cli.Context) error {
 		return cli.ShowCommandHelp(ctx, ctx.Command.Name)
 	}
 
-	reg, err := registry.Open(flags.Registry)
+	reg, err := registry.Open(registryFlag)
 	if err != nil {
 		return err
 	}
 
 	var source *registry.Source
-	if flags.Source != "" {
+	if sourceFlag != "" {
 		for _, s := range reg.Sources {
-			if strings.EqualFold(s.Name, flags.Source) {
+			if strings.EqualFold(s.Name, sourceFlag) {
 				source = s
 				break
 			}
 		}
 		if source == nil {
-			return fmt.Errorf("could not find source for %s", flags.Source)
+			return fmt.Errorf("could not find source for %s", sourceFlag)
 		}
 	}
 

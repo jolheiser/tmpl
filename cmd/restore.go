@@ -3,7 +3,6 @@ package cmd
 import (
 	"os"
 
-	"go.jolheiser.com/tmpl/cmd/flags"
 	"go.jolheiser.com/tmpl/registry"
 
 	"github.com/rs/zerolog/log"
@@ -18,7 +17,7 @@ var Restore = &cli.Command{
 }
 
 func runRestore(_ *cli.Context) error {
-	reg, err := registry.Open(flags.Registry)
+	reg, err := registry.Open(registryFlag)
 	if err != nil {
 		return err
 	}

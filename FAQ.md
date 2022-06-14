@@ -6,34 +6,28 @@ This documentation aims to cover FAQs and setup.
 
 A "valid" tmpl template only requires two things
 
-1. A `template.toml` file in the root directory.
+1. A `tmpl.yaml` file in the root directory.
 2. A `template` directory that serves as the "root" of the template.
 
-## template.toml
+## tmpl.yaml
 
-**NOTE:** The template.toml file will be expanded, though not with the full power of the template itself.  
-The template.toml file will only expand environment variables with syntax `$USER` or `${USER}`.  
+**NOTE:** The tmpl.yaml file will be expanded, though not with the full power of the template itself.  
+The tmpl.yaml file will only expand environment variables with syntax `$USER` or `${USER}`.  
 For full documentation on the syntax, see [os.ExpandEnv](https://golang.org/pkg/os/#ExpandEnv).
 
 When using the `--defaults` flag, no prompts will be shown and only default values will be used.  
 As another alternative, any environment variable that matches a key will bypass the prompt.  
 For example, `author` would have the corresponding environment variable `TMPL_VAR_AUTHOR`.
 
-```toml
-# Key-value pairs can be simple
-# The user will receive a basic prompt asking them to fill out the variable
-project = "my-project"
+```yaml
+# tmpl.yaml
+# Write any template args here to prompt the user for, giving any defaults/options as applicable
 
-# Extended properties MUST be added after any simple key-value pairs (due to how TOML works)
-
-# The "key" is enclosed in braces
-[author]
-# prompt is what will be shown to prompt the user
-prompt = "The name of the author of this project"
-# help would be extra information (generally seen by giving '?' to a prompt)
-help = "Who will be primarily writing this project"
-# default is the "value" part of the simple pair. This could be a suggested value
-default = "$USER"
+prompts:
+  - id: project                           # The unique ID for the prompt
+    label: Project Name                   # The prompt message/label
+    help: The name to use in the project  # Optional help message for the prompt
+    default: tmpl                         # Prompt default
 ```
 
 ## template directory
@@ -44,7 +38,7 @@ Everything in this directory (including paths and file names!) will be executed 
 
 See the [documentation](https://golang.org/pkg/text/template/) for every available possibility, but some basic examples are...
 
-* A variable defined in template.toml (tmpl allows for keys to be called as a func or variable, whichever you prefer!)
+* An id defined in `tmpl.yaml` (tmpl allows for keys to be called as a func or variable, whichever you prefer!)
    * `{{project}}` or `{{.project}}`
    * `{{author}}` or `{{.author}}`
 * Conditionally including something
@@ -54,18 +48,20 @@ See the [documentation](https://golang.org/pkg/text/template/) for every availab
 
 For a full list, see [helper.go](registry/helper.go)
 
-|Helper|Example|Output|
-|-----|-----|-----|
-|upper|`{{upper project}}`|`MY-PROJECT`|
-|lower|`{{lower project}}`|`my-project`|
-|title|`{{title project}}`|`My-Project`|
-|snake|`{{snake project}}`|`my_project`|
-|kebab|`{{kebab project}}`|`my-project`|
-|pascal|`{{pascal project}}`|`MyProject`|
-|camel|`{{camel project}}`|`myProject`|
-|env|`{{env "USER"}}`|The current user|
-|sep|`{{sep}}`|Filepath separator for current OS|
-|time}|`{{time "01/02/2006"}}`|`11/21/2020` - The time according to the given [format](https://flaviocopes.com/go-date-time-format/)|
+| Helper      | Example                          | Output                                                                                                |
+|-------------|----------------------------------|-------------------------------------------------------------------------------------------------------|
+| upper       | `{{upper project}}`              | `MY-PROJECT`                                                                                          |
+| lower       | `{{lower project}}`              | `my-project`                                                                                          |
+| title       | `{{title project}}`              | `My-Project`                                                                                          |
+| snake       | `{{snake project}}`              | `my_project`                                                                                          |
+| kebab       | `{{kebab project}}`              | `my-project`                                                                                          |
+| pascal      | `{{pascal project}}`             | `MyProject`                                                                                           |
+| camel       | `{{camel project}}`              | `myProject`                                                                                           |
+| env         | `{{env "USER"}}`                 | The current user                                                                                      |
+| sep         | `{{sep}}`                        | Filepath separator for current OS                                                                     |
+| time        | `{{time "01/02/2006"}}`          | `11/21/2020` - The time according to the given [format](https://flaviocopes.com/go-date-time-format/) |
+| trim_prefix | `{{trim_prefix "foobar" "foo"}}` | `bar`                                                                                                 |
+| trim_suffix | `{{trim_suffix "foobar" "bar"}}` | `foo`                                                                                                 |
 
 ## Sources
 

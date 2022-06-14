@@ -4,8 +4,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"go.jolheiser.com/tmpl/cmd/flags"
-
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 )
@@ -13,12 +11,16 @@ import (
 var (
 	Version    = "develop"
 	defaultDir string
+
+	registryFlag string
+	sourceFlag   string
 )
 
 func init() {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		log.Error().Msg("could not locate user's home directory, tmpl will use temp dir for registry")
+		defaultDir = filepath.Join(os.TempDir(), ".tmpl")
 		return
 	}
 	defaultDir = filepath.Join(home, ".tmpl")
@@ -37,14 +39,14 @@ func NewApp() *cli.App {
 			Usage:       "Registry directory of tmpl",
 			Value:       defaultDir,
 			DefaultText: "~/.tmpl",
-			Destination: &flags.Registry,
+			Destination: &registryFlag,
 			EnvVars:     []string{"TMPL_REGISTRY"},
 		},
 		&cli.StringFlag{
 			Name:        "source",
 			Aliases:     []string{"s"},
 			Usage:       "Short-name source to use",
-			Destination: &flags.Source,
+			Destination: &sourceFlag,
 			EnvVars:     []string{"TMPL_SOURCE"},
 		},
 	}

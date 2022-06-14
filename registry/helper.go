@@ -9,8 +9,7 @@ import (
 	"github.com/huandu/xstrings"
 )
 
-var funcMap = map[string]interface{}{
-
+var funcMap = map[string]any{
 	// String conversions
 	"upper":  strings.ToUpper,
 	"lower":  strings.ToLower,
@@ -20,6 +19,12 @@ var funcMap = map[string]interface{}{
 	"pascal": xstrings.ToCamelCase,
 	"camel": func(in string) string {
 		return xstrings.FirstRuneToLower(xstrings.ToCamelCase(in))
+	},
+	"trim_prefix": func(in, trim string) string {
+		return strings.TrimPrefix(in, trim)
+	},
+	"trim_suffix": func(in, trim string) string {
+		return strings.TrimSuffix(in, trim)
 	},
 
 	// Other

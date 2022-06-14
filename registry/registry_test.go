@@ -1,26 +1,24 @@
 package registry
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/matryer/is"
 )
 
 var (
 	tmplDir string
 	regDir  string
-	destDir string
 	reg     *Registry
 )
 
 func TestMain(m *testing.M) {
 	var err error
-	destDir, err = ioutil.TempDir(os.TempDir(), "tmpl-dest")
-	if err != nil {
-		panic(err)
-	}
 
 	// Set up template
 	setupTemplate()
@@ -30,9 +28,6 @@ func TestMain(m *testing.M) {
 
 	status := m.Run()
 
-	if err = os.RemoveAll(destDir); err != nil {
-		fmt.Printf("could not clean up temp directory %s\n", destDir)
-	}
 	if err = os.RemoveAll(tmplDir); err != nil {
 		fmt.Printf("could not clean up temp directory %s\n", tmplDir)
 	}
@@ -51,25 +46,22 @@ func TestTemplate(t *testing.T) {
 }
 
 func testSave(t *testing.T) {
-	if _, err := reg.SaveTemplate("test", tmplDir); err != nil {
-		t.Log("could not save template")
-		t.FailNow()
-	}
+	assert := is.New(t)
+	_, err := reg.SaveTemplate("test", tmplDir)
+	assert.NoErr(err) // Should save template
 }
 
 func testGet(t *testing.T) {
+	assert := is.New(t)
 	_, err := reg.GetTemplate("test")
-	if err != nil {
-		t.Logf("could not get template")
-		t.FailNow()
-	}
+	assert.NoErr(err) // Should get template
 }
 
 func testGetFail(t *testing.T) {
+	assert := is.New(t)
 	_, err := reg.GetTemplate("fail")
-	if !IsErrTemplateNotFound(err) {
-		t.Logf("template should not exist")
-		t.FailNow()
+	if !errors.As(err, &ErrTemplateNotFound{}) {
+		assert.Fail() // Template should not exist
 	}
 }
 
@@ -81,7 +73,7 @@ func setupTemplate() {
 	}
 
 	// Template config
-	fi, err := os.Create(filepath.Join(tmplDir, "template.toml"))
+	fi, err := os.Create(filepath.Join(tmplDir, "tmpl.yaml"))
 	if err != nil {
 		panic(err)
 	}

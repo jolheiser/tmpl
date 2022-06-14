@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"go.jolheiser.com/tmpl/cmd/flags"
 	"go.jolheiser.com/tmpl/registry"
 
 	"github.com/rs/zerolog/log"
@@ -21,7 +20,7 @@ func runUpdate(ctx *cli.Context) error {
 		return cli.ShowCommandHelp(ctx, ctx.Command.Name)
 	}
 
-	reg, err := registry.Open(flags.Registry)
+	reg, err := registry.Open(registryFlag)
 	if err != nil {
 		return err
 	}

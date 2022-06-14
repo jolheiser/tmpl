@@ -5,7 +5,6 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"go.jolheiser.com/tmpl/cmd/flags"
 	"go.jolheiser.com/tmpl/registry"
 
 	"github.com/rs/zerolog/log"
@@ -50,7 +49,7 @@ var (
 )
 
 func runSourceList(_ *cli.Context) error {
-	reg, err := registry.Open(flags.Registry)
+	reg, err := registry.Open(registryFlag)
 	if err != nil {
 		return err
 	}
@@ -72,7 +71,7 @@ func runSourceAdd(ctx *cli.Context) error {
 		return cli.ShowCommandHelp(ctx, ctx.Command.Name)
 	}
 
-	reg, err := registry.Open(flags.Registry)
+	reg, err := registry.Open(registryFlag)
 	if err != nil {
 		return err
 	}
@@ -91,7 +90,7 @@ func runSourceRemove(ctx *cli.Context) error {
 		return cli.ShowCommandHelp(ctx, ctx.Command.Name)
 	}
 
-	reg, err := registry.Open(flags.Registry)
+	reg, err := registry.Open(registryFlag)
 	if err != nil {
 		return err
 	}

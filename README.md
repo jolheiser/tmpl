@@ -8,7 +8,7 @@ The two projects share many similarities, however other than general layout/stru
 
 [CLI Docs](CLI.md)
 
-[Project Docs/FAQs](DOCS.md)
+[Project Docs/FAQs](FAQ.md)
 
 ## Examples 
 
