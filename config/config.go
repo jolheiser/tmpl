@@ -16,10 +16,11 @@ type Config struct {
 
 // Prompt is a tmpl prompt
 type Prompt struct {
-	ID      string `yaml:"id"`
-	Label   string `yaml:"label"`
-	Help    string `yaml:"help"`
-	Default any    `yaml:"default"`
+	ID      string   `yaml:"id"`
+	Label   string   `yaml:"label"`
+	Help    string   `yaml:"help"`
+	Default string   `yaml:"default"`
+	Options []string `yaml:"options"`
 }
 
 // Load loads a tmpl config

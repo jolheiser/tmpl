@@ -33,9 +33,6 @@ func prompt(dir string, defaults bool) (templatePrompts, error) {
 		if tp.Label == "" {
 			tp.Label = tp.ID
 		}
-		if tp.Default == nil {
-			tp.Default = ""
-		}
 		prompts = append(prompts, tp)
 	}
 
@@ -50,52 +47,32 @@ func prompt(dir string, defaults bool) (templatePrompts, error) {
 
 		// Check if we are using defaults
 		if defaults {
-			val := prompt.Default
-			switch t := prompt.Default.(type) {
-			case []string:
-				for idy, s := range t {
-					t[idy] = os.ExpandEnv(s)
-				}
-				val = t
-			case string:
-				val = os.ExpandEnv(t)
-			}
-			s := fmt.Sprint(val)
-			prompts[idx].Value = s
-			os.Setenv(fmt.Sprintf("TMPL_PROMPT_%s", envKey), s)
+			val := os.ExpandEnv(prompt.Default)
+			prompts[idx].Value = val
+			os.Setenv(fmt.Sprintf("TMPL_PROMPT_%s", envKey), val)
 			continue
 		}
 
+		// Otherwise, prompt
 		var p survey.Prompt
-		switch t := prompt.Default.(type) {
-		case []string:
-			for idy, s := range t {
-				t[idy] = os.ExpandEnv(s)
+		if len(prompt.Options) > 0 {
+			opts := make([]string, 0, len(prompt.Options))
+			for idy, opt := range prompt.Options {
+				opts[idy] = os.ExpandEnv(opt)
 			}
 			p = &survey.Select{
 				Message: prompt.Label,
-				Options: t,
+				Options: opts,
 				Help:    prompt.Help,
 			}
-		case bool:
-			p = &survey.Confirm{
-				Message: prompt.Label,
-				Default: t,
-				Help:    prompt.Help,
-			}
-		case string:
+		} else {
 			p = &survey.Input{
 				Message: prompt.Label,
-				Default: os.ExpandEnv(t),
-				Help:    prompt.Help,
-			}
-		default:
-			p = &survey.Input{
-				Message: prompt.Label,
-				Default: fmt.Sprint(t),
+				Default: os.ExpandEnv(prompt.Default),
 				Help:    prompt.Help,
 			}
 		}
+
 		var a string
 		if err := survey.AskOne(p, &a); err != nil {
 			return nil, err

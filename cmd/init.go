@@ -36,7 +36,7 @@ func runInit(_ *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	if _, err := fi.WriteString(comments); err != nil {
+	if _, err := fi.WriteString(initConfig); err != nil {
 		return err
 	}
 	if err := os.Mkdir("template", os.ModePerm); err != nil {
@@ -46,12 +46,15 @@ func runInit(_ *cli.Context) error {
 	return fi.Close()
 }
 
-var comments = `# tmpl.yaml
+var initConfig = `# tmpl.yaml
 # Write any template args here to prompt the user for, giving any defaults/options as applicable
 
 prompts:
   - id: name                              # The unique ID for the prompt
-    label: Project Name                   # The prompt message/label
-    help: The name to use in the project  # Optional help message for the prompt
-    default: tmpl                         # Prompt default
+    label: Project Name                   # (Optional) Prompt message/label, defaults to id
+    help: The name to use in the project  # (Optional) Help message for the prompt
+    default: tmpl                         # (Optional) Prompt default
+    options:                              # (Optional) Set of options the user can choose from
+      - coolproject123
+      - ${USER}'s cool project
 `

@@ -48,20 +48,21 @@ See the [documentation](https://golang.org/pkg/text/template/) for every availab
 
 For a full list, see [helper.go](registry/helper.go)
 
-| Helper      | Example                          | Output                                                                                                |
-|-------------|----------------------------------|-------------------------------------------------------------------------------------------------------|
-| upper       | `{{upper project}}`              | `MY-PROJECT`                                                                                          |
-| lower       | `{{lower project}}`              | `my-project`                                                                                          |
-| title       | `{{title project}}`              | `My-Project`                                                                                          |
-| snake       | `{{snake project}}`              | `my_project`                                                                                          |
-| kebab       | `{{kebab project}}`              | `my-project`                                                                                          |
-| pascal      | `{{pascal project}}`             | `MyProject`                                                                                           |
-| camel       | `{{camel project}}`              | `myProject`                                                                                           |
-| env         | `{{env "USER"}}`                 | The current user                                                                                      |
-| sep         | `{{sep}}`                        | Filepath separator for current OS                                                                     |
-| time        | `{{time "01/02/2006"}}`          | `11/21/2020` - The time according to the given [format](https://flaviocopes.com/go-date-time-format/) |
-| trim_prefix | `{{trim_prefix "foobar" "foo"}}` | `bar`                                                                                                 |
-| trim_suffix | `{{trim_suffix "foobar" "bar"}}` | `foo`                                                                                                 |
+| Helper      | Example                            | Output                                                                                                |
+|-------------|------------------------------------|-------------------------------------------------------------------------------------------------------|
+| upper       | `{{upper project}}`                | `MY-PROJECT`                                                                                          |
+| lower       | `{{lower project}}`                | `my-project`                                                                                          |
+| title       | `{{title project}}`                | `My-Project`                                                                                          |
+| snake       | `{{snake project}}`                | `my_project`                                                                                          |
+| kebab       | `{{kebab project}}`                | `my-project`                                                                                          |
+| pascal      | `{{pascal project}}`               | `MyProject`                                                                                           |
+| camel       | `{{camel project}}`                | `myProject`                                                                                           |
+| env         | `{{env "USER"}}`                   | The current user                                                                                      |
+| sep         | `{{sep}}`                          | Filepath separator for current OS                                                                     |
+| time        | `{{time "01/02/2006"}}`            | `11/21/2020` - The time according to the given [format](https://flaviocopes.com/go-date-time-format/) |
+| trim_prefix | `{{trim_prefix "foobar" "foo"}}`   | `bar`                                                                                                 |
+| trim_suffix | `{{trim_suffix "foobar" "bar"}}`   | `foo`                                                                                                 |
+| replace     | `{{replace "foobar" "bar" "baz"}}` | `foobaz`                                                                                              |
 
 ## Sources
 

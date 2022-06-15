@@ -1,0 +1,20 @@
+prompts:
+  - label: Bar
+    default: baz
+    help: |
+      This is a foobar!
+    options:
+      - "1"
+      - bonk
+      - "false"
+  - id: test
+    label: 1234
+  - id: test123
+    options: []
+  - label: 1234
+    default: false
+    help: # nil
+    options:
+      - 1
+      - 2
+      - true

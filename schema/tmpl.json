@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://git.jojodev.com/jolheiser/tmpl/src/branch/main/schema/tmpl.json",
+  "$id": "https://git.jojodev.com/jolheiser/tmpl/raw/branch/main/schema/tmpl.json",
   "title": "tmpl template",
   "description": "A template for tmpl",
   "type": "object",
@@ -28,16 +28,16 @@
             "description": "A label to show instead of the ID when prompting",
             "type": "string"
           },
-          "default": {
-            "description": "A default value for the prompt",
-            "type": "string"
-          },
           "help": {
             "description": "A help message for more information on a prompt",
             "type": "string"
           },
-          "depends_on": {
-            "description": "A list of prompt IDs that this prompt depends on",
+          "default": {
+            "description": "A default value for the prompt",
+            "type": "string"
+          },
+          "options": {
+            "description": "A set of options for this prompt",
             "type": "array",
             "minItems": 1,
             "items": {

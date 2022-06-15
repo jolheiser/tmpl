@@ -10,7 +10,6 @@ import (
 )
 
 var funcMap = map[string]any{
-	// String conversions
 	"upper":  strings.ToUpper,
 	"lower":  strings.ToLower,
 	"title":  strings.Title,
@@ -20,15 +19,10 @@ var funcMap = map[string]any{
 	"camel": func(in string) string {
 		return xstrings.FirstRuneToLower(xstrings.ToCamelCase(in))
 	},
-	"trim_prefix": func(in, trim string) string {
-		return strings.TrimPrefix(in, trim)
-	},
-	"trim_suffix": func(in, trim string) string {
-		return strings.TrimSuffix(in, trim)
-	},
-
-	// Other
-	"env": os.Getenv,
+	"trim_prefix": strings.TrimPrefix,
+	"trim_suffix": strings.TrimSuffix,
+	"replace":     strings.ReplaceAll,
+	"env":         os.Getenv,
 	"sep": func() string {
 		return string(filepath.Separator)
 	},

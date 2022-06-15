@@ -1,0 +1,10 @@
+prompts:
+  - id: foo
+    label: Bar
+    default: baz
+    help: |
+      This is a foobar!
+    options:
+      - "1"
+      - bonk
+      - "false"
