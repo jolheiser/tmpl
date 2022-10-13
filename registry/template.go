@@ -10,6 +10,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/Masterminds/sprig/v3"
 	"github.com/mholt/archiver/v3"
 )
 
@@ -50,7 +51,7 @@ func (t *Template) Execute(dest string, defaults, overwrite bool) error {
 		return err
 	}
 
-	funcs := mergeMaps(funcMap, prompts.ToFuncMap())
+	funcs := mergeMaps(funcMap, prompts.ToFuncMap(), sprig.TxtFuncMap())
 	base := filepath.Join(tmp, "template")
 	return filepath.Walk(base, func(walkPath string, walkInfo os.FileInfo, walkErr error) error {
 		if walkErr != nil {
