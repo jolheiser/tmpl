@@ -113,7 +113,7 @@ I realize that many users will be using GitHub, and most will likely still be us
 
 ## Backup and Restore
 
-1. The simplest solution is to make a copy of your `registry.toml` (default: `~/.tmpl/registry.toml`).
+1. The simplest solution is to make a copy of your `registry.yaml` (default: `~/.tmpl/registry.yaml`).
    * Once in the new location, you will need to use `tmpl restore`.
    
 2. Alternatively, you can copy/paste the entire registry (default: `~/.tmpl`) and skip the restore step.

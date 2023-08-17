@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"path"
 	"strings"
 
 	"go.jolheiser.com/tmpl/env"
@@ -15,7 +17,7 @@ var Download = &cli.Command{
 	Name:        "download",
 	Usage:       "Download a template",
 	Description: "Download a template and save it to the local registry",
-	ArgsUsage:   "[repository URL] [name]",
+	ArgsUsage:   "[repository URL] <name>",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:    "branch",
@@ -29,7 +31,7 @@ var Download = &cli.Command{
 }
 
 func runDownload(ctx *cli.Context) error {
-	if ctx.NArg() < 2 {
+	if ctx.NArg() < 1 {
 		return cli.ShowCommandHelp(ctx, ctx.Command.Name)
 	}
 
@@ -67,11 +69,27 @@ func runDownload(ctx *cli.Context) error {
 		cloneURL += ".git"
 	}
 
-	t, err := reg.DownloadTemplate(ctx.Args().Get(1), cloneURL, ctx.String("branch"))
+	t, err := reg.DownloadTemplate(deriveName(ctx), cloneURL, ctx.String("branch"))
 	if err != nil {
 		return err
 	}
 
 	log.Info().Msgf("Added new template %q", t.Name)
 	return nil
+}
+
+func deriveName(ctx *cli.Context) string {
+	if ctx.NArg() > 1 {
+		return ctx.Args().Get(1)
+	}
+
+	envBranch, envSet := os.LookupEnv("TMPL_BRANCH")
+	flagBranch, flagSet := ctx.String("branch"), ctx.IsSet("branch")
+	if flagSet {
+		if !envSet || envBranch != flagBranch {
+			return flagBranch
+		}
+	}
+
+	return path.Base(ctx.Args().First())
 }
