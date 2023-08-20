@@ -14,13 +14,25 @@ type Config struct {
 	Prompts []Prompt `yaml:"prompts"`
 }
 
+// PromptType is a type of prompt
+type PromptType string
+
+const (
+	PromptTypeInput     PromptType = "input"
+	PromptTypeMultiline PromptType = "multi"
+	PromptTypeEditor    PromptType = "editor"
+	PromptTypeConfirm   PromptType = "confirm"
+	PromptTypeSelect    PromptType = "select"
+)
+
 // Prompt is a tmpl prompt
 type Prompt struct {
-	ID      string   `yaml:"id"`
-	Label   string   `yaml:"label"`
-	Help    string   `yaml:"help"`
-	Default string   `yaml:"default"`
-	Options []string `yaml:"options"`
+	ID      string     `yaml:"id"`
+	Label   string     `yaml:"label"`
+	Help    string     `yaml:"help"`
+	Default string     `yaml:"default"`
+	Options []string   `yaml:"options"`
+	Type    PromptType `yaml:"type"`
 }
 
 // Load loads a tmpl config

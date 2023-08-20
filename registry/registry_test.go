@@ -3,7 +3,6 @@ package registry
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -67,7 +66,7 @@ func testGetFail(t *testing.T) {
 
 func setupTemplate() {
 	var err error
-	tmplDir, err = ioutil.TempDir(os.TempDir(), "tmpl-setup")
+	tmplDir, err = os.MkdirTemp(os.TempDir(), "tmpl-setup")
 	if err != nil {
 		panic(err)
 	}
@@ -115,7 +114,7 @@ func setupTemplate() {
 
 func setupRegistry() {
 	var err error
-	regDir, err = ioutil.TempDir(os.TempDir(), "tmpl-reg")
+	regDir, err = os.MkdirTemp(os.TempDir(), "tmpl-reg")
 	if err != nil {
 		panic(err)
 	}

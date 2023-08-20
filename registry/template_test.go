@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -51,7 +50,7 @@ func testExecute(t *testing.T) {
 
 	// Check contents of file
 	testPath := filepath.Join(destDir, "TEST")
-	contents, err := ioutil.ReadFile(testPath)
+	contents, err := os.ReadFile(testPath)
 	assert.NoErr(err)                        // Should be able to read TEST file
 	assert.Equal(string(contents), tmplGold) // Template should match golden file
 
@@ -66,7 +65,7 @@ func testExecute(t *testing.T) {
 	assert.True(err != nil) // .tmplkeep file should NOT be retained
 
 	// Change file to test non-overwrite
-	err = ioutil.WriteFile(testPath, []byte(tmplNewGold), os.ModePerm)
+	err = os.WriteFile(testPath, []byte(tmplNewGold), os.ModePerm)
 	assert.NoErr(err) // Writing file should succeed
 
 	err = tmpl.Execute(destDir, true, false)

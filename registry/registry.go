@@ -2,7 +2,6 @@ package registry
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -223,7 +222,7 @@ func create(regFile string) error {
 }
 
 func download(cloneURL, branch, dest string) error {
-	tmp, err := ioutil.TempDir(os.TempDir(), "tmpl")
+	tmp, err := os.MkdirTemp(os.TempDir(), "tmpl")
 	if err != nil {
 		return err
 	}

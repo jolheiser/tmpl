@@ -43,8 +43,32 @@
             "items": {
               "type": "string"
             }
+          },
+          "type": {
+            "description": "The type of prompt",
+            "type": "string",
+            "enum": ["input", "multi", "select", "confirm", "editor"]
           }
-        }
+        },
+        "anyOf": [
+          {
+            "properties": {
+              "type": {
+                "const": "select"
+              }
+            },
+            "required": ["options"]
+          },
+          {
+            "properties": {
+              "type": {
+                "not": {
+                  "const": "select"
+                }
+              }
+            }
+          }
+        ]
       }
     }
   }

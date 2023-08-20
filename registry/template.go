@@ -3,7 +3,6 @@ package registry
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -36,7 +35,7 @@ func (t *Template) ArchivePath() string {
 
 // Execute runs the Template and copies to dest
 func (t *Template) Execute(dest string, defaults, overwrite bool) error {
-	tmp, err := ioutil.TempDir(os.TempDir(), "tmpl")
+	tmp, err := os.MkdirTemp(os.TempDir(), "tmpl")
 	if err != nil {
 		return err
 	}
@@ -62,7 +61,7 @@ func (t *Template) Execute(dest string, defaults, overwrite bool) error {
 			return nil
 		}
 
-		contents, err := ioutil.ReadFile(walkPath)
+		contents, err := os.ReadFile(walkPath)
 		if err != nil {
 			return err
 		}

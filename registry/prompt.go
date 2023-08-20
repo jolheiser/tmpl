@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -55,7 +56,8 @@ func prompt(dir string, defaults bool) (templatePrompts, error) {
 
 		// Otherwise, prompt
 		var p survey.Prompt
-		if len(prompt.Options) > 0 {
+		switch prompt.Type {
+		case config.PromptTypeSelect:
 			opts := make([]string, 0, len(prompt.Options))
 			for idy, opt := range prompt.Options {
 				opts[idy] = os.ExpandEnv(opt)
@@ -65,7 +67,26 @@ func prompt(dir string, defaults bool) (templatePrompts, error) {
 				Options: opts,
 				Help:    prompt.Help,
 			}
-		} else {
+		case config.PromptTypeConfirm:
+			def, _ := strconv.ParseBool(os.ExpandEnv(prompt.Default))
+			p = &survey.Confirm{
+				Message: prompt.Label,
+				Help:    prompt.Help,
+				Default: def,
+			}
+		case config.PromptTypeMultiline:
+			p = &survey.Multiline{
+				Message: prompt.Label,
+				Default: os.ExpandEnv(prompt.Default),
+				Help:    prompt.Help,
+			}
+		case config.PromptTypeEditor:
+			p = &survey.Editor{
+				Message: prompt.Label,
+				Default: os.ExpandEnv(prompt.Default),
+				Help:    prompt.Help,
+			}
+		default:
 			p = &survey.Input{
 				Message: prompt.Label,
 				Default: os.ExpandEnv(prompt.Default),
@@ -73,12 +94,13 @@ func prompt(dir string, defaults bool) (templatePrompts, error) {
 			}
 		}
 
-		var a string
-		if err := survey.AskOne(p, &a); err != nil {
-			return nil, err
+		m := make(map[string]any)
+		if err := survey.AskOne(p, &m); err != nil {
+			return nil, fmt.Errorf("could not complete prompt: %w", err)
 		}
+		a := m[""]
 		prompts[idx].Value = a
-		os.Setenv(fmt.Sprintf("TMPL_PROMPT_%s", envKey), a)
+		os.Setenv(fmt.Sprintf("TMPL_PROMPT_%s", envKey), fmt.Sprint(a))
 	}
 
 	return prompts, nil
@@ -86,7 +108,7 @@ func prompt(dir string, defaults bool) (templatePrompts, error) {
 
 type templatePrompt struct {
 	config.Prompt
-	Value string
+	Value any
 }
 
 type templatePrompts []templatePrompt
