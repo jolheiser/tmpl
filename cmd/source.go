@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"text/tabwriter"
@@ -28,7 +29,13 @@ var (
 		Name:        "list",
 		Usage:       "List available sources",
 		Description: "List all available sources in the registry",
-		Action:      runSourceList,
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:  "json",
+				Usage: "JSON format",
+			},
+		},
+		Action: runSourceList,
 	}
 
 	SourceAdd = &cli.Command{
@@ -48,10 +55,14 @@ var (
 	}
 )
 
-func runSourceList(_ *cli.Context) error {
+func runSourceList(ctx *cli.Context) error {
 	reg, err := registry.Open(registryFlag)
 	if err != nil {
 		return err
+	}
+
+	if ctx.Bool("json") {
+		return json.NewEncoder(os.Stdout).Encode(reg.Sources)
 	}
 
 	wr := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)

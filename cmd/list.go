@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"text/tabwriter"
@@ -14,13 +15,23 @@ var List = &cli.Command{
 	Name:        "list",
 	Usage:       "List templates in the registry",
 	Description: "List all usable templates currently downloaded in the registry",
-	Action:      runList,
+	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:  "json",
+			Usage: "JSON format",
+		},
+	},
+	Action: runList,
 }
 
-func runList(_ *cli.Context) error {
+func runList(ctx *cli.Context) error {
 	reg, err := registry.Open(registryFlag)
 	if err != nil {
 		return err
+	}
+
+	if ctx.Bool("json") {
+		return json.NewEncoder(os.Stdout).Encode(reg.Templates)
 	}
 
 	wr := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
