@@ -45,7 +45,7 @@ func testExecute(t *testing.T) {
 	assert.NoErr(err) // Should get template
 
 	// Execute template
-	err = tmpl.Execute(destDir, true, true)
+	err = tmpl.Execute(destDir, true, true, true)
 	assert.NoErr(err) // Should execute template
 
 	// Check contents of file
@@ -68,7 +68,7 @@ func testExecute(t *testing.T) {
 	err = os.WriteFile(testPath, []byte(tmplNewGold), os.ModePerm)
 	assert.NoErr(err) // Writing file should succeed
 
-	err = tmpl.Execute(destDir, true, false)
+	err = tmpl.Execute(destDir, true, true, false)
 	assert.NoErr(err) // Should execute template
 
 	contents, err = os.ReadFile(testPath)

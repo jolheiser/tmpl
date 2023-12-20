@@ -34,7 +34,7 @@ func (t *Template) ArchivePath() string {
 }
 
 // Execute runs the Template and copies to dest
-func (t *Template) Execute(dest string, defaults, overwrite bool) error {
+func (t *Template) Execute(dest string, defaults, accessible, overwrite bool) error {
 	tmp, err := os.MkdirTemp(os.TempDir(), "tmpl")
 	if err != nil {
 		return err
@@ -45,7 +45,7 @@ func (t *Template) Execute(dest string, defaults, overwrite bool) error {
 		return err
 	}
 
-	prompts, err := prompt(tmp, defaults)
+	prompts, err := prompt(tmp, defaults, accessible)
 	if err != nil {
 		return err
 	}

@@ -10,10 +10,10 @@ import (
 
 	"go.jolheiser.com/tmpl/config"
 
-	"github.com/AlecAivazis/survey/v2"
+	"github.com/charmbracelet/huh"
 )
 
-func prompt(dir string, defaults bool) (templatePrompts, error) {
+func prompt(dir string, defaults, accessible bool) (templatePrompts, error) {
 	templatePath := filepath.Join(dir, "tmpl.yaml")
 	fi, err := os.Open(templatePath)
 	if err != nil {
@@ -55,52 +55,48 @@ func prompt(dir string, defaults bool) (templatePrompts, error) {
 		}
 
 		// Otherwise, prompt
-		var p survey.Prompt
+		var f huh.Field
 		switch prompt.Type {
 		case config.PromptTypeSelect:
-			opts := make([]string, 0, len(prompt.Options))
+			opts := make([]huh.Option[string], 0, len(prompt.Options))
 			for idy, opt := range prompt.Options {
-				opts[idy] = os.ExpandEnv(opt)
+				o := os.ExpandEnv(opt)
+				opts[idy] = huh.NewOption(o, o)
 			}
-			p = &survey.Select{
-				Message: prompt.Label,
-				Options: opts,
-				Help:    prompt.Help,
-			}
+			def := prompt.Default
+			f = huh.NewSelect[string]().
+				Title(prompt.Label).
+				Description(prompt.Help).
+				Options(opts...).
+				Key(prompt.ID).
+				Value(&def)
 		case config.PromptTypeConfirm:
 			def, _ := strconv.ParseBool(os.ExpandEnv(prompt.Default))
-			p = &survey.Confirm{
-				Message: prompt.Label,
-				Help:    prompt.Help,
-				Default: def,
-			}
-		case config.PromptTypeMultiline:
-			p = &survey.Multiline{
-				Message: prompt.Label,
-				Default: os.ExpandEnv(prompt.Default),
-				Help:    prompt.Help,
-			}
-		case config.PromptTypeEditor:
-			p = &survey.Editor{
-				Message: prompt.Label,
-				Default: os.ExpandEnv(prompt.Default),
-				Help:    prompt.Help,
-			}
+			f = huh.NewConfirm().
+				Title(prompt.Label).
+				Description(prompt.Help).
+				Key(prompt.ID).
+				Value(&def)
+		case config.PromptTypeMultiline, config.PromptTypeEditor:
+			def := os.ExpandEnv(prompt.Default)
+			f = huh.NewText().
+				Title(prompt.Label).
+				Description(prompt.Help).
+				Key(prompt.ID).
+				Value(&def)
 		default:
-			p = &survey.Input{
-				Message: prompt.Label,
-				Default: os.ExpandEnv(prompt.Default),
-				Help:    prompt.Help,
-			}
+			def := os.ExpandEnv(prompt.Default)
+			f = huh.NewInput().
+				Title(prompt.Label).
+				Description(prompt.Help).
+				Key(prompt.ID).
+				Value(&def)
 		}
-
-		m := make(map[string]any)
-		if err := survey.AskOne(p, &m); err != nil {
-			return nil, fmt.Errorf("could not complete prompt: %w", err)
+		if err := huh.NewForm(huh.NewGroup(f)).WithAccessible(accessible).WithTheme(huh.ThemeCatppuccin()).Run(); err != nil {
+			return nil, fmt.Errorf("could not run field: %w", err)
 		}
-		a := m[""]
-		prompts[idx].Value = a
-		os.Setenv(fmt.Sprintf("TMPL_PROMPT_%s", envKey), fmt.Sprint(a))
+		prompts[idx].Value = f.GetValue()
+		os.Setenv(fmt.Sprintf("TMPL_PROMPT_%s", envKey), fmt.Sprint(f.GetValue()))
 	}
 
 	return prompts, nil

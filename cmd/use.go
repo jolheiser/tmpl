@@ -21,6 +21,10 @@ var Use = &cli.Command{
 			Name:  "force",
 			Usage: "Overwrite existing files",
 		},
+		&cli.BoolFlag{
+			Name:  "accessible",
+			Usage: "Prompt in accessible mode (one prompt at a time)",
+		},
 	},
 	ArgsUsage: "[name] [destination (default: \".\")]",
 	Action:    runUse,
@@ -54,7 +58,7 @@ func runUse(ctx *cli.Context) error {
 		return err
 	}
 
-	if err := tmpl.Execute(dest, ctx.Bool("defaults"), ctx.Bool("force")); err != nil {
+	if err := tmpl.Execute(dest, ctx.Bool("defaults"), ctx.Bool("accessible"), ctx.Bool("force")); err != nil {
 		return err
 	}
 
